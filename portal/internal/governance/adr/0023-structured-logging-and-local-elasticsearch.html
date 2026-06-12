@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en" data-portal="internal" data-theme="light"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ADR 0023 · Structured Logging and Local Elasticsearch · Study App Internal</title>
+  <script>(function(){try{var v=localStorage.getItem("docs-theme-preference");if(v==="dark"||v==="light")document.documentElement.setAttribute("data-theme",v);}catch(e){}})();</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..900&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="../../../../frontend/portal/assets_v2/favicon.svg">
+  <link rel="stylesheet" href="../../../../frontend/portal/assets_v2/runtime/internal/entry.css">
+</head>
+<body data-page-type="reference" class="docs-shell" data-maintainer-ids="16fc8b78537109162984a2fdbef6e142" data-service="none" data-lifecycle="published" data-updated="2026-06-06" data-role="architect">
+
+  <header class="topbar" role="banner">
+    <a class="topbar__brand" href="../../index.html"><span aria-hidden="true">🛠</span><span>Study App · Internal</span></a>
+    <nav class="topbar__breadcrumbs" aria-label="Breadcrumb">
+      <ol class="docs-breadcrumbs__list">
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="../../index.html">Internal</a></li>
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="../index.html">Governance</a></li>
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="index.html">ADR</a></li>
+        <li class="docs-breadcrumbs__item" aria-current="page">0023</li>
+      </ol>
+    </nav>
+    <div class="topbar__spacer"></div>
+    <div class="topbar__actions">
+      <button class="docs-theme-toggle" type="button" aria-label="Toggle theme"></button>
+    </div>
+  </header>
+
+  <aside data-component="sidebar" data-nav-src="../../../../frontend/portal/assets_v2/ui-kit/mocks/nav-tree-internal.json" aria-label="Section navigation"></aside>
+
+  <main class="container">
+    <article class="docs-prose">
+
+      <header class="page-head">
+        <div class="home-hero__eyebrow">
+          <span class="docs-pill docs-pill--info">ADR · 0023</span>
+          <div class="lifecycle-popover">
+            <a class="docs-pill docs-pill--success" href="0018-adr-lifecycle-ratification-and-badges.html">Accepted</a>
+            <div class="lifecycle-popover__panel" role="tooltip">
+              <span class="lifecycle-popover__title">Lifecycle · this ADR</span>
+              <ol class="lifecycle-popover__stages">
+                <li class="lifecycle-popover__stage" data-stage="decision">
+                  <span class="lifecycle-popover__stage-label">Decision</span>
+                  <ul class="lifecycle-popover__states">
+                    <li>Proposed</li>
+                    <li class="is-current">Accepted</li>
+                    <li>Superseded</li>
+                  </ul>
+                </li>
+                <li class="lifecycle-popover__stage" data-stage="documentation">
+                  <span class="lifecycle-popover__stage-label">Documentation</span>
+                  <ul class="lifecycle-popover__states">
+                    <li>Draft</li>
+                    <li>Ready</li>
+                  </ul>
+                </li>
+                <li class="lifecycle-popover__stage" data-stage="implementation">
+                  <span class="lifecycle-popover__stage-label">Implementation</span>
+                  <ul class="lifecycle-popover__states">
+                    <li>Not started</li>
+                    <li>In progress</li>
+                    <li>Done</li>
+                  </ul>
+                </li>
+              </ol>
+              <a class="lifecycle-popover__link" href="0018-adr-lifecycle-ratification-and-badges.html">Open ADR 0018 →</a>
+            </div>
+          </div>
+        </div>
+        <h1>Structured Logging, Request Correlation, and Local Elasticsearch</h1>
+        <div id="docs-top-nav"></div>
+        <p class="lede">
+          NDJSON logs with stable fields, an <code>X-Request-Id</code> header on every response, and an optional Compose stack (Elasticsearch + Kibana + Filebeat) for local search.
+        </p>
+      </header>
+
+      <section aria-labelledby="metadata-h">
+        <h2 id="metadata-h">Metadata</h2>
+        <dl class="svc-meta svc-meta--neutral">
+          <dt>ADR</dt>
+          <dd><code>0023</code> — Structured Logging, Request Correlation, and Local Elasticsearch</dd>
+          <dt>Category</dt>
+          <dd>operations</dd>
+          <dt>Owner</dt>
+          <dd><a href="../../team/people/ivan-boyarkin/index.html">Ivan Boyarkin</a></dd>
+          <dt>Decided on</dt>
+          <dd><time datetime="2026-05-17">2026-05-17</time></dd>
+          <dt>Last reviewed</dt>
+          <dd><time datetime="2026-06-01">2026-06-01</time></dd>
+        </dl>
+      </section>
+
+      <section aria-labelledby="context-h">
+        <h2 id="context-h">Context</h2>
+        <p><strong>Why this matters:</strong> Plain text logs are fine for a single terminal but do not scale to centralized search, dashboards, or joining logs with future distributed traces. Large teams standardize on <strong>structured logs</strong> (JSON), <strong>request correlation</strong> (<code>X-Request-Id</code>), and optional <strong>trace/span ids</strong> once OpenTelemetry is adopted.</p>
+        <p><strong>Elasticsearch and Kibana</strong> are widely used for log search and analytics. Elastic publishes Docker images that are <strong>free to run locally</strong> for development and learning; production licensing and support are separate commercial decisions. This ADR covers <em>local optional</em> Compose only—not a commitment to Elastic Cloud or a paid tier.</p>
+      </section>
+
+      <section aria-labelledby="decision-h">
+        <h2 id="decision-h">Decision</h2>
+        <ul>
+          <li>Support <code>LOG_FORMAT=text</code> and <code>LOG_FORMAT=json</code> (NDJSON: one JSON object per line). When <code>LOG_FORMAT</code> is unset, the process default is <strong><code>json</code></strong> so <code>request_id</code> is a first-class field. Stable JSON fields include <code>@timestamp</code>, <code>level</code>, <code>message</code>, <code>service</code> (<code>LOG_SERVICE_NAME</code>), <code>app_env</code>, <code>request_id</code>, <code>trace_id</code>, <code>span_id</code> (latter two <code>null</code> until tracing is wired).</li>
+          <li>Add HTTP middleware (outermost) that sets <code>X-Request-Id</code> on every response: reuse a valid incoming header or generate a UUID.</li>
+          <li>CORS <code>expose_headers</code> (<code>CORS_EXPOSE_HEADERS</code>) lists <code>X-Request-Id</code> (and rate-limit headers) so browser <code>fetch</code> on another origin can read them; OpenAPI is patched so Swagger UI shows an optional <strong>Parameters → X-Request-Id</strong> field and response headers for each operation.</li>
+          <li>Optional Docker Compose stack: Elasticsearch + Kibana + Filebeat (<code>services/monitoring/docker-compose.logging.yml</code>), mounting <code>./logs</code> read-only into Filebeat. Ship NDJSON only: use <code>LOG_FORMAT=json</code> (or rely on the default <code>json</code> when <code>LOG_FORMAT</code> is unset).</li>
+          <li>Full <strong>distributed tracing</strong> in Elasticsearch (Elastic APM or OTLP → Elastic) remains out of scope here; see backlog item 17 (OpenTelemetry).</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="scope-h">
+        <h2 id="scope-h">Scope</h2>
+        <ul>
+          <li><strong>In scope:</strong> the conventions, rules, and artefacts named in the Decision section above.</li>
+          <li><strong>Out of scope:</strong> any system, process, or surface not explicitly listed here.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="alternatives-h">
+        <h2 id="alternatives-h">Alternatives considered</h2>
+        <p>Three alternatives evaluated before adopting NDJSON + <code>X-Request-Id</code> + optional Compose ES. Each rejected with a rooted reason.</p>
+        <div class="docs-card-grid docs-card-grid--stack">
+          <article class="docs-card" data-tone="warn">
+            <div class="docs-card__head"><h3 class="docs-card__title">Plain-text logs with <code>logger.info()</code> + tail</h3><span class="docs-pill docs-pill--danger">rejected</span></div>
+            <div class="docs-card__body">
+              <p><strong>Why considered:</strong> the Python default; zero setup; readable in a terminal.</p>
+              <p><strong>Why rejected:</strong> text logs cannot be queried by field. The «find every log line for this <code>request_id</code>» operation degrades to grep-with-regex, which fails as soon as fields contain spaces, multi-line stack traces, or non-ASCII data. Structured logs make the query exact.</p>
+            </div>
+          </article>
+          <article class="docs-card" data-tone="warn">
+            <div class="docs-card__head"><h3 class="docs-card__title">Hosted log aggregator (Datadog / Honeycomb / Loki Cloud)</h3><span class="docs-pill docs-pill--danger">rejected</span></div>
+            <div class="docs-card__body">
+              <p><strong>Why considered:</strong> turnkey ingest + UI, no local stack to operate.</p>
+              <p><strong>Why rejected:</strong> vendor lock at the ingest path; we ship NDJSON with field names tuned to a vendor's schema. The Elasticsearch + Kibana local stack uses ECS shapes (open standard); migrating to a different consumer later is a config-change, not a rewrite. Defer hosted aggregation until we ship for money.</p>
+            </div>
+          </article>
+          <article class="docs-card" data-tone="warn">
+            <div class="docs-card__head"><h3 class="docs-card__title">OpenTelemetry collector + OTLP from day one</h3><span class="docs-pill docs-pill--danger">rejected</span></div>
+            <div class="docs-card__body">
+              <p><strong>Why considered:</strong> the «one signal pipeline» pattern — logs, metrics, traces all flow through OTel.</p>
+              <p><strong>Why rejected:</strong> OTel collector is a separate process with its own config + version skew. We are not yet emitting traces; bringing the collector in for logs alone overshoots the cost. Revisit when distributed tracing lands (backlog <code>BL-017</code>).</p>
+            </div>
+          </article>
+        </div>
+        <p><strong>Trade we accept by choosing NDJSON + <code>X-Request-Id</code> + optional ES Compose.</strong> Stdlib-only JSON formatter, no external dependency, ECS-aligned. We accept it because each rejected alternative either forfeits the field-query property (text), locks us to a vendor (hosted), or adds a process before the benefit lands (OTel-from-day-one).</p>
+      </section>
+
+      <section aria-labelledby="consequences-h">
+        <h2 id="consequences-h">Consequences</h2>
+        <div class="docs-card-grid docs-card-grid--stack">
+          <article class="docs-card" data-tone="success">
+            <div class="docs-card__head"><h3 class="docs-card__title">Positive</h3><span class="docs-pill docs-pill--success">wins</span></div>
+            <div class="docs-card__body">
+              <ul>
+                <li>Logs can be indexed and searched in Kibana during local debugging.</li>
+                <li>Correlation id is visible to API clients and appears in log lines.</li>
+                <li>No new Python dependency for JSON logging (stdlib only).</li>
+              </ul>
+            </div>
+          </article>
+          <article class="docs-card" data-tone="warn">
+            <div class="docs-card__head"><h3 class="docs-card__title">Trade-offs</h3><span class="docs-pill docs-pill--warn">costs</span></div>
+            <div class="docs-card__body">
+              <p>Two named tradeoffs. Shape from <a href="../../handbook/sa/tradeoff-disclosure.html">Tradeoff disclosure</a>.</p>
+              <ul class="rail-list" data-tone="rose">
+                <li><strong>NDJSON with stable schema (vs free-form text).</strong> We gain a log that Kibana, jq, and any future log shipper can index without bespoke parsers. We lose readability when tailing without a pretty-printer — a raw NDJSON line is unfriendly to the human eye. We accept it because <code>jq</code> or <code>lnav</code> is one pipe away, and the indexable property is the load-bearing «can we grep request_id in production-style storage?» test.</li>
+                <li><strong>Elasticsearch + Kibana stack is heavy.</strong> We gain a real log-search UX that mirrors what production logging would look like. We lose ~2 GiB of memory when the stack is up, and accept that the local stack is optional (not a default). We accept it because the alternative — toy log viewers — fail to surface the indexing semantics (mapping conflicts, data streams) that real production debugging hits. Better to learn those on a local stack than during the first SEV-2.</li>
+              </ul>
+            </div>
+          </article>
+        </div>
+        <h3>Revisit — would we do this again?</h3>
+        <p><strong>Yes — the «<code>request_id</code> on every line» bet has paid back on every debug session.</strong> One refinement we would commit to on day one if starting today:</p>
+        <ul class="rail-list" data-tone="info">
+          <li><strong>Document the «data-stream vs index pattern» Kibana gotcha as a runbook entry, not just in the ADR.</strong> The «<code>study-app-logs-*</code> vs <code>*study-app-logs*</code>» trap (Kibana shows zero docs while files grow on disk) cost ~30 min on first encounter and is recurring. A dedicated runbook step would let on-call resolve it in 60 s.</li>
+        </ul>
+
+      </section>
+
+      <section aria-labelledby="compatibility-h">
+        <h2 id="compatibility-h">Compatibility and migration</h2>
+        <ul>
+          <li><strong>Backward-compatibility impact:</strong> none — pure governance / convention change with no wire-level effect for existing consumers.</li>
+          <li><strong>Migration plan:</strong> apply the rules to new work; bring existing artefacts into compliance during normal touch-ups.</li>
+          <li><strong>Rollback strategy:</strong> revert the merge PR; no data or schema changes to undo.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="implementation-h">
+        <h2 id="implementation-h">Implementation in this repository</h2>
+        <div class="docs-table-wrap" role="region" aria-label="Structured logging implementation surfaces">
+          <table class="docs-table docs-table--zebra">
+            <thead>
+              <tr><th scope="col">Category</th><th scope="col">Path / target</th><th scope="col">Note</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Request-context</td><td><code>services/api/app/core/request_context.py</code></td><td>context variables + <code>X-Request-Id</code> validation</td></tr>
+              <tr><td>Logging formatters</td><td><code>services/api/app/core/logging.py</code></td><td>text vs JSON; <code>RequestContextFilter</code></td></tr>
+              <tr><td>Middleware wiring</td><td><code>services/api/app/main.py</code></td><td><code>request_context_middleware</code> registered last (runs first on the wire)</td></tr>
+              <tr><td>Filebeat config</td><td><code>services/monitoring/filebeat/filebeat.yml</code></td><td>—</td></tr>
+              <tr><td>Compose stack</td><td><code>services/monitoring/docker-compose.logging.yml</code></td><td>Elasticsearch + Kibana + Filebeat</td></tr>
+              <tr><td>Make targets</td><td><code>logging-up</code> / <code>logging-down</code> / <code>logging-smoke</code> / <code>logging-reset</code></td><td>(<a href="0008-make-command-taxonomy-and-workflow-entrypoints.html">ADR 0008</a>)</td></tr>
+              <tr><td>Smoke scripts</td><td><code>scripts/check_logging_links.py</code></td><td>ES + Kibana liveness</td></tr>
+              <tr><td>CLI search</td><td><code>scripts/check_es_request_id.py</code></td><td>find a request_id without Kibana</td></tr>
+              <tr><td>Uvicorn config</td><td><code>--no-access-log</code></td><td>structured <code>request_done</code> entries replace access lines</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section aria-labelledby="validation-h">
+        <h2 id="validation-h">Validation</h2>
+        <ul>
+          <li><strong>Technical checks:</strong> CI lints, type-checks, and contract tests stay green on every PR.</li>
+          <li><strong>Operational checks:</strong> the relevant runbook reflects this rule.</li>
+          <li><strong>Documentation updates:</strong> README, CHANGELOG, and related ADRs cross-reference this decision.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="kibana-h">
+        <h2 id="kibana-h">Kibana index pattern (important)</h2>
+        <p>Create the data view with index pattern <strong><code>*study-app-logs*</code></strong>, not only <code>study-app-logs-*</code>. Otherwise Discover may target no indices: Elasticsearch 8 often writes Filebeat output to data stream backing indices named <code>.ds-study-app-logs-…</code>, which do not match a prefix of <code>study-app-logs-</code>. A symptom is "No results" for valid <code>request_id</code> queries even though documents exist in <code>logs/app.log</code>. Filebeat is configured with <code>setup.template.type: legacy</code> so new daily indices align with <code>study-app-logs-*</code>; the broad pattern still matches old and new names.</p>
+        <p>JSON lines must follow ECS shapes where the index template expects objects: use <code>service.name</code> (nested under <code>service</code>), not a string at <code>service</code>. Otherwise bulk indexing can fail with <code>mapper_parsing_exception</code> and indices show <code>docs.count: 0</code> while <code>logs/app.log</code> still grows on disk.</p>
+      </section>
+
+      <footer class="docs-history" aria-label="History">
+        <h2 class="docs-history__title">History</h2>
+        <ul class="docs-history__list">
+          <li class="docs-history__row">
+            <span class="docs-history__date">2026-06-01</span>
+            <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm">@ivan</a>
+            <span class="docs-history__note">Substance audit-pass. Status pill → <code>.lifecycle-popover</code>; <code>§ Implementation</code> nested bullets → 9-row <code>.docs-table</code>; <code>§ Trade-offs</code> restructured into canonical entries (NDJSON · heavy ES stack); new <code>§ Alternatives considered</code> (plain text · hosted aggregator · OTel-from-day-one); new <code>§ Would we do this again?</code> proposing data-stream-vs-index runbook. Inline <code>style</code> stripped.</span>
+          </li>
+          <li class="docs-history__row">
+            <span class="docs-history__date">2026-05-17</span>
+            <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm">@ivan</a>
+            <span class="docs-history__note">Migrated to UI Kit v3.</span>
+          </li>
+        </ul>
+      </footer>
+
+    </article>
+  </main>
+
+  <aside class="docs-toc" aria-label="On this page"></aside>
+  <button data-component="toc-fab" type="button" aria-label="On this page" aria-expanded="false"></button>
+
+  <script type="module" src="../../../../frontend/portal/assets_v2/runtime/internal/entry.js"></script>
+
+</body></html>

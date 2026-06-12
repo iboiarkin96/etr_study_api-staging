@@ -1,0 +1,2638 @@
+{
+  "components": {
+    "schemas": {
+      "ApiErrorResponse": {
+        "description": "Standard error ``detail`` object for 4xx/5xx business and security failures.\n\nAttributes:\n    code: Project-wide stable error code.\n    key: Machine-readable key for clients.\n    message: Human-readable English message.\n    source: Origin layer (e.g. ``business``, ``security``).",
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "key",
+          "message",
+          "source"
+        ],
+        "title": "ApiErrorResponse",
+        "type": "object"
+      },
+      "DocsSearchTelemetryIngestRequest": {
+        "description": "Client-emitted docs-search telemetry event.\n\nAttributes:\n    event: Event name (for example ``search_query``).\n    emitted_at_ms: Event epoch timestamp in milliseconds.\n    page_path: Browser path where event was emitted.\n    session_id: Search session identifier.\n    query_id: Per-query identifier.\n    query_text: Normalized query text.\n    query_len: Query text length.\n    tokens_count: Number of query tokens.\n    results_count: Number of search results.\n    result_rank: Rank of clicked result (1-based).\n    result_url: Relative docs URL of clicked result.\n    latency_ms: End-to-end search latency on client side.\n    time_to_success_ms: Time from first query in session to first click success.\n    time_to_click_ms: Time from this query to click.\n    source: Interaction source (for example ``mouse_click``).\n    top_results: Top-N result descriptors logged as impressions.\n    payload: Arbitrary extension fields preserved in raw payload JSON.",
+        "properties": {
+          "emitted_at_ms": {
+            "minimum": 0.0,
+            "title": "Emitted At Ms",
+            "type": "integer"
+          },
+          "event": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Event",
+            "type": "string"
+          },
+          "latency_ms": {
+            "default": 0,
+            "maximum": 60000.0,
+            "minimum": 0.0,
+            "title": "Latency Ms",
+            "type": "integer"
+          },
+          "page_path": {
+            "default": "",
+            "maxLength": 512,
+            "title": "Page Path",
+            "type": "string"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "title": "Payload",
+            "type": "object"
+          },
+          "query_id": {
+            "default": "",
+            "maxLength": 128,
+            "title": "Query Id",
+            "type": "string"
+          },
+          "query_len": {
+            "default": 0,
+            "maximum": 1024.0,
+            "minimum": 0.0,
+            "title": "Query Len",
+            "type": "integer"
+          },
+          "query_text": {
+            "default": "",
+            "maxLength": 1024,
+            "title": "Query Text",
+            "type": "string"
+          },
+          "result_rank": {
+            "default": 0,
+            "maximum": 10000.0,
+            "minimum": 0.0,
+            "title": "Result Rank",
+            "type": "integer"
+          },
+          "result_url": {
+            "default": "",
+            "maxLength": 1024,
+            "title": "Result Url",
+            "type": "string"
+          },
+          "results_count": {
+            "default": 0,
+            "maximum": 10000.0,
+            "minimum": 0.0,
+            "title": "Results Count",
+            "type": "integer"
+          },
+          "session_id": {
+            "default": "",
+            "maxLength": 128,
+            "title": "Session Id",
+            "type": "string"
+          },
+          "source": {
+            "default": "",
+            "maxLength": 64,
+            "title": "Source",
+            "type": "string"
+          },
+          "time_to_click_ms": {
+            "default": 0,
+            "maximum": 86400000.0,
+            "minimum": 0.0,
+            "title": "Time To Click Ms",
+            "type": "integer"
+          },
+          "time_to_success_ms": {
+            "default": 0,
+            "maximum": 86400000.0,
+            "minimum": 0.0,
+            "title": "Time To Success Ms",
+            "type": "integer"
+          },
+          "tokens_count": {
+            "default": 0,
+            "maximum": 128.0,
+            "minimum": 0.0,
+            "title": "Tokens Count",
+            "type": "integer"
+          },
+          "top_results": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Top Results",
+            "type": "array"
+          }
+        },
+        "required": [
+          "event",
+          "emitted_at_ms"
+        ],
+        "title": "DocsSearchTelemetryIngestRequest",
+        "type": "object"
+      },
+      "DocsSearchTelemetryMetricsResponse": {
+        "description": "Response payload with docs-search KPI aggregates.\n\nAttributes:\n    window_minutes: Aggregation horizon in minutes.\n    total_queries: Number of ``search_query`` events in the window.\n    zero_result_queries: Number of queries with empty result set.\n    zero_result_rate: Ratio of zero-result queries.\n    queries_with_click: Number of unique queries that got at least one click.\n    query_ctr: Query-level click-through rate.\n    median_time_to_first_success_ms: P50 for first success in session.\n    p75_time_to_first_success_ms: P75 for first success in session.",
+        "properties": {
+          "median_time_to_first_success_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Median Time To First Success Ms"
+          },
+          "p75_time_to_first_success_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P75 Time To First Success Ms"
+          },
+          "queries_with_click": {
+            "title": "Queries With Click",
+            "type": "integer"
+          },
+          "query_ctr": {
+            "title": "Query Ctr",
+            "type": "number"
+          },
+          "total_queries": {
+            "title": "Total Queries",
+            "type": "integer"
+          },
+          "window_minutes": {
+            "title": "Window Minutes",
+            "type": "integer"
+          },
+          "zero_result_queries": {
+            "title": "Zero Result Queries",
+            "type": "integer"
+          },
+          "zero_result_rate": {
+            "title": "Zero Result Rate",
+            "type": "number"
+          }
+        },
+        "required": [
+          "window_minutes",
+          "total_queries",
+          "zero_result_queries",
+          "zero_result_rate",
+          "queries_with_click",
+          "query_ctr",
+          "median_time_to_first_success_ms",
+          "p75_time_to_first_success_ms"
+        ],
+        "title": "DocsSearchTelemetryMetricsResponse",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "description": "Wrapper returned for HTTP 422 responses. The ``detail`` array carries one **ValidationError** per failing field, mirroring the FastAPI / Pydantic v2 contract. Clients should render each entry's ``loc`` and ``msg`` to guide the user.",
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "LiveResponse": {
+        "description": "``GET /live`` \u2014 process up signal without dependency checks.\n\nAttributes:\n    status: Fixed literal ``alive`` for a healthy process.\n    app_env: Active ``APP_ENV`` profile (``dev``, ``qa``, ``prod``).",
+        "properties": {
+          "app_env": {
+            "description": "Logical deployment profile from APP_ENV (dev, qa, prod).",
+            "examples": [
+              "dev",
+              "qa",
+              "prod"
+            ],
+            "title": "App Env",
+            "type": "string"
+          },
+          "status": {
+            "default": "alive",
+            "examples": [
+              "alive"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "app_env"
+        ],
+        "title": "LiveResponse",
+        "type": "object"
+      },
+      "ReadyResponse": {
+        "description": "``GET /ready`` \u2014 dependency checks (used with HTTP 200 or 503).\n\nAttributes:\n    status: ``ready`` or ``not_ready`` depending on checks.\n    checks: Map of check name to short state string (e.g. ``database``).\n    db_latency_ms: Observed database round-trip in milliseconds, if measured.",
+        "properties": {
+          "checks": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Checks",
+            "type": "object"
+          },
+          "db_latency_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "examples": [
+              1.42,
+              null
+            ],
+            "title": "Db Latency Ms"
+          },
+          "status": {
+            "default": "ready",
+            "examples": [
+              "ready",
+              "not_ready"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "title": "ReadyResponse",
+        "type": "object"
+      },
+      "UserCreateRequest": {
+        "description": "JSON body for ``POST /api/v1/user`` (validated before idempotency and service layer).\n\n``system_user_id`` and ``system_uuid`` form the composite natural key (DB unique constraint).\nField-level rules, OpenAPI examples, and timezone validation live on the ``Field``\ndefinitions and :data:`app.schemas.enums.TimezoneField`.",
+        "properties": {
+          "full_name": {
+            "description": "Full name of the user.",
+            "examples": [
+              "Ivan Petrov"
+            ],
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Full Name",
+            "type": "string"
+          },
+          "invalidation_reason_uuid": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Related invalidation reason UUID.",
+            "examples": [
+              "c3d4e5f6-0003-4000-8000-000000000003"
+            ],
+            "title": "Invalidation Reason Uuid"
+          },
+          "is_row_invalid": {
+            "default": 0,
+            "description": "Invalid row flag (0/1).",
+            "examples": [
+              0,
+              1
+            ],
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Is Row Invalid",
+            "type": "integer"
+          },
+          "system_user_id": {
+            "description": "User ID in the source system; unique together with `system_uuid`.",
+            "examples": [
+              "134tg"
+            ],
+            "maxLength": 36,
+            "minLength": 1,
+            "title": "System User Id",
+            "type": "string"
+          },
+          "system_uuid": {
+            "description": "UUID of the source system (`systems.system_uuid`); composite key with `system_user_id`.",
+            "examples": [
+              "b2c3d4e5-0002-4000-8000-000000000002"
+            ],
+            "format": "uuid",
+            "title": "System Uuid",
+            "type": "string"
+          },
+          "timezone": {
+            "default": "UTC",
+            "description": "IANA timezone name (e.g. 'UTC', 'Europe/Moscow').",
+            "examples": [
+              "Europe/Moscow",
+              "UTC",
+              "America/New_York"
+            ],
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Timezone",
+            "type": "string"
+          },
+          "username": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Username or login.",
+            "examples": [
+              "ipetrov"
+            ],
+            "title": "Username"
+          }
+        },
+        "required": [
+          "system_user_id",
+          "full_name",
+          "system_uuid"
+        ],
+        "title": "UserCreateRequest",
+        "type": "object"
+      },
+      "UserCreateResponse": {
+        "description": "User resource returned by create (201), get (200), update (200), and patch (200); maps ORM :class:`~app.models.core.user.User`.\n\nAttributes:\n    client_uuid: Internal client identifier (UUID string).\n    created_at: Row creation timestamp (timezone-aware).\n    updated_at: Last update timestamp (timezone-aware).\n    is_row_invalid: Soft-invalidation flag (0 or 1).\n    invalidation_reason_uuid: FK to invalidation reason, if set.\n    system_user_id: External system user id when present.\n    system_uuid: Related system UUID when present.\n    username: Optional display username.\n    full_name: Required full name.\n    timezone: IANA timezone string stored for the user.",
+        "properties": {
+          "client_uuid": {
+            "title": "Client Uuid",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "full_name": {
+            "title": "Full Name",
+            "type": "string"
+          },
+          "invalidation_reason_uuid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Invalidation Reason Uuid"
+          },
+          "is_row_invalid": {
+            "title": "Is Row Invalid",
+            "type": "integer"
+          },
+          "system_user_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "System User Id"
+          },
+          "system_uuid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "System Uuid"
+          },
+          "timezone": {
+            "title": "Timezone",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Username"
+          }
+        },
+        "required": [
+          "client_uuid",
+          "created_at",
+          "updated_at",
+          "is_row_invalid",
+          "invalidation_reason_uuid",
+          "system_user_id",
+          "system_uuid",
+          "username",
+          "full_name",
+          "timezone"
+        ],
+        "title": "UserCreateResponse",
+        "type": "object"
+      },
+      "UserPatchRequest": {
+        "additionalProperties": false,
+        "description": "JSON body for ``PATCH /api/v1/user/{system_uuid}/{system_user_id}`` \u2014 partial update; omit fields to leave unchanged.",
+        "properties": {
+          "full_name": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Full name; omit to leave unchanged.",
+            "examples": [
+              "Ivan Petrov"
+            ],
+            "title": "Full Name"
+          },
+          "invalidation_reason_uuid": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Invalidation reason UUID; set null to clear.",
+            "examples": [
+              "c3d4e5f6-0003-4000-8000-000000000003"
+            ],
+            "title": "Invalidation Reason Uuid"
+          },
+          "is_row_invalid": {
+            "anyOf": [
+              {
+                "maximum": 1.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Invalid row flag (0/1).",
+            "examples": [
+              0,
+              1
+            ],
+            "title": "Is Row Invalid"
+          },
+          "system_uuid": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Related system UUID; set null to clear.",
+            "examples": [
+              "b2c3d4e5-0002-4000-8000-000000000002"
+            ],
+            "title": "System Uuid"
+          },
+          "timezone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "IANA timezone; omit to leave unchanged.",
+            "examples": [
+              "Europe/Moscow",
+              "UTC",
+              "America/New_York"
+            ],
+            "title": "Timezone"
+          },
+          "username": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Username or login; set null to clear.",
+            "examples": [
+              "ipetrov"
+            ],
+            "title": "Username"
+          }
+        },
+        "title": "UserPatchRequest",
+        "type": "object"
+      },
+      "UserUpdateRequest": {
+        "description": "JSON body for ``PUT /api/v1/user/{system_uuid}/{system_user_id}`` \u2014 full replacement of mutable profile fields.",
+        "properties": {
+          "full_name": {
+            "description": "Full name of the user.",
+            "examples": [
+              "Ivan Petrov"
+            ],
+            "maxLength": 255,
+            "minLength": 1,
+            "title": "Full Name",
+            "type": "string"
+          },
+          "invalidation_reason_uuid": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Related invalidation reason UUID.",
+            "examples": [
+              "c3d4e5f6-0003-4000-8000-000000000003"
+            ],
+            "title": "Invalidation Reason Uuid"
+          },
+          "is_row_invalid": {
+            "default": 0,
+            "description": "Invalid row flag (0/1).",
+            "examples": [
+              0,
+              1
+            ],
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Is Row Invalid",
+            "type": "integer"
+          },
+          "system_uuid": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Related system UUID; set null to clear.",
+            "examples": [
+              "b2c3d4e5-0002-4000-8000-000000000002"
+            ],
+            "title": "System Uuid"
+          },
+          "timezone": {
+            "description": "IANA timezone name (e.g. 'UTC', 'Europe/Moscow').",
+            "examples": [
+              "Europe/Moscow",
+              "UTC",
+              "America/New_York"
+            ],
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Timezone",
+            "type": "string"
+          },
+          "username": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Username or login.",
+            "examples": [
+              "ipetrov"
+            ],
+            "title": "Username"
+          }
+        },
+        "required": [
+          "full_name",
+          "timezone"
+        ],
+        "title": "UserUpdateRequest",
+        "type": "object"
+      },
+      "ValidationError": {
+        "description": "Single field-level validation failure. ``loc`` is the JSON path inside the request body or query that triggered the error; ``msg`` is a human-readable message; ``type`` is the Pydantic error code (for example ``string_too_short``); ``input`` and ``ctx`` are present when Pydantic supplies them.",
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "ValidationErrorItem": {
+        "description": "Single entry in the ``errors`` array of a 422 response.\n\nAttributes:\n    code: Stable validation error code (e.g. ``USER_001``).\n    key: Machine-readable key.\n    message: Human-readable message for this failure.\n    field: JSON field name when applicable.\n    source: Always ``validation`` for this model.\n    details: Raw Pydantic context (``loc``, ``type``, ``input``, etc.).",
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "details": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Details"
+          },
+          "field": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Field"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "key",
+          "message",
+          "source"
+        ],
+        "title": "ValidationErrorItem",
+        "type": "object"
+      },
+      "ValidationErrorResponse": {
+        "description": "Top-level body for HTTP 422 validation failures.\n\nAttributes:\n    error_type: Fixed discriminator (e.g. ``validation_error``).\n    endpoint: ``METHOD path`` string for the failing request.\n    errors: List of :class:`ValidationErrorItem` entries.",
+        "properties": {
+          "endpoint": {
+            "title": "Endpoint",
+            "type": "string"
+          },
+          "error_type": {
+            "title": "Error Type",
+            "type": "string"
+          },
+          "errors": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationErrorItem"
+            },
+            "title": "Errors",
+            "type": "array"
+          }
+        },
+        "required": [
+          "error_type",
+          "endpoint",
+          "errors"
+        ],
+        "title": "ValidationErrorResponse",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "APIKeyHeader": {
+        "in": "header",
+        "name": "X-API-Key",
+        "type": "apiKey"
+      }
+    }
+  },
+  "info": {
+    "description": "ETR Study App API. The API is versioned with the code, readable in the browser.",
+    "title": "ETR Study App API",
+    "version": "1.1.1"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/v1/user": {
+      "post": {
+        "description": "Creates a new user; uniqueness is `(system_user_id, system_uuid)`. Requires `Idempotency-Key` header for safe retry semantics.\n\n### Example request (curl)\n```bash\ncurl -X POST 'http://127.0.0.1:8000/api/v1/user' \\\n  -H 'accept: application/json' \\\n  -H 'Content-Type: application/json' \\\n  -H 'X-API-Key: ....' \\\n  -H 'Idempotency-Key: create-user-sample-1' \\\n  -d '{\"system_user_id\":\"2\",\"system_uuid\":\"b2c3d4e5-0002-4000-8000-000000000002\",\"full_name\":\"Ivan Petrov\"}'\n```",
+        "operationId": "createUser",
+        "parameters": [
+          {
+            "description": "Required idempotency key for write deduplication. Use printable ASCII only (no Cyrillic/Unicode).",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "description": "Required idempotency key for write deduplication. Use printable ASCII only (no Cyrillic/Unicode).",
+              "maxLength": 128,
+              "minLength": 1,
+              "pattern": "^[ -~]+$",
+              "title": "Idempotency-Key",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Optional correlation id. If you send **X-Request-Id**, the same value is returned in the response header and written to server logs as **request_id** (JSON logs / Elasticsearch). If omitted, the server generates a UUID.",
+            "in": "header",
+            "name": "X-Request-Id",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "examples": {
+                "default": {
+                  "summary": "Basic registration",
+                  "value": {
+                    "full_name": "Ivan Petrov",
+                    "is_row_invalid": 0,
+                    "system_user_id": "134tg",
+                    "system_uuid": "b2c3d4e5-0002-4000-8000-000000000002",
+                    "timezone": "Europe/Moscow",
+                    "username": "ipetrov"
+                  }
+                },
+                "minimal": {
+                  "summary": "Only required fields",
+                  "value": {
+                    "full_name": "Ivan Petrov",
+                    "system_user_id": "134tg",
+                    "system_uuid": "b2c3d4e5-0002-4000-8000-000000000002"
+                  }
+                }
+              },
+              "schema": {
+                "$ref": "#/components/schemas/UserCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserCreateResponse"
+                }
+              }
+            },
+            "description": "User created successfully.",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "idempotency_key_missing": {
+                    "summary": "Missing Idempotency-Key header",
+                    "value": {
+                      "code": "COMMON_400",
+                      "key": "IDEMPOTENCY_KEY_REQUIRED",
+                      "message": "Missing required `Idempotency-Key` header for write operation.",
+                      "source": "business"
+                    }
+                  },
+                  "user_exists": {
+                    "summary": "User already exists",
+                    "value": {
+                      "code": "USER_101",
+                      "key": "USER_CREATE_ALREADY_EXISTS",
+                      "message": "User with this `system_user_id` and `system_uuid` already exists.",
+                      "source": "business"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Business validation failure.",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "auth_required": {
+                    "summary": "Auth header required",
+                    "value": {
+                      "code": "COMMON_401",
+                      "key": "SECURITY_AUTH_REQUIRED",
+                      "message": "Missing or invalid API key in header `X-API-Key`.",
+                      "source": "security"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Missing or invalid API key header.",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "idempotency_conflict": {
+                    "summary": "Idempotency key conflict",
+                    "value": {
+                      "code": "COMMON_409",
+                      "key": "IDEMPOTENCY_KEY_REUSED_WITH_DIFFERENT_PAYLOAD",
+                      "message": "Idempotency key was already used with another payload.",
+                      "source": "business"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Idempotency key was reused with different payload.",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "body_too_large": {
+                    "summary": "Body size limit exceeded",
+                    "value": {
+                      "code": "COMMON_413",
+                      "key": "SECURITY_REQUEST_BODY_TOO_LARGE",
+                      "message": "Request body exceeds configured maximum size.",
+                      "source": "security"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Request body exceeds configured maximum size.",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "empty_full_name": {
+                    "summary": "full_name is empty",
+                    "value": {
+                      "endpoint": "POST /api/v1/user",
+                      "error_type": "validation_error",
+                      "errors": [
+                        {
+                          "code": "USER_004",
+                          "details": {
+                            "ctx": {
+                              "min_length": 1
+                            },
+                            "input": "",
+                            "loc": [
+                              "body",
+                              "full_name"
+                            ],
+                            "type": "string_too_short"
+                          },
+                          "field": "full_name",
+                          "key": "USER_CREATE_FULL_NAME_TOO_SHORT",
+                          "message": "Field `full_name` must not be empty.",
+                          "source": "validation"
+                        }
+                      ]
+                    }
+                  },
+                  "empty_system_user_id": {
+                    "summary": "system_user_id is empty",
+                    "value": {
+                      "endpoint": "POST /api/v1/user",
+                      "error_type": "validation_error",
+                      "errors": [
+                        {
+                          "code": "USER_002",
+                          "details": {
+                            "ctx": {
+                              "min_length": 1
+                            },
+                            "input": "",
+                            "loc": [
+                              "body",
+                              "system_user_id"
+                            ],
+                            "type": "string_too_short"
+                          },
+                          "field": "system_user_id",
+                          "key": "USER_CREATE_SYSTEM_USER_ID_INVALID",
+                          "message": "Field `system_user_id` must not be empty.",
+                          "source": "validation"
+                        }
+                      ]
+                    }
+                  },
+                  "full_name_too_long": {
+                    "summary": "full_name exceeds max length",
+                    "value": {
+                      "endpoint": "POST /api/v1/user",
+                      "error_type": "validation_error",
+                      "errors": [
+                        {
+                          "code": "USER_005",
+                          "details": {
+                            "ctx": {
+                              "max_length": 255
+                            },
+                            "input": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                            "loc": [
+                              "body",
+                              "full_name"
+                            ],
+                            "type": "string_too_long"
+                          },
+                          "field": "full_name",
+                          "key": "USER_CREATE_FULL_NAME_TOO_LONG",
+                          "message": "Field `full_name` exceeds max length.",
+                          "source": "validation"
+                        }
+                      ]
+                    }
+                  },
+                  "invalid_invalidation_reason_uuid": {
+                    "summary": "invalidation_reason_uuid is not a UUID",
+                    "value": {
+                      "endpoint": "POST /api/v1/user",
+                      "error_type": "validation_error",
+                      "errors": [
+                        {
+                          "code": "USER_010",
+                          "details": {
+                            "ctx": {
+                              "error": "invalid character: expected an optional prefix of `urn:uuid:` followed by [0-9a-fA-F-], found `b` at 1"
+                            },
+                            "input": "bad-uuid",
+                            "loc": [
+                              "body",
+                              "invalidation_reason_uuid"
+                            ],
+                            "type": "uuid_parsing"
+                          },
+                          "field": "invalidation_reason_uuid",
+                          "key": "USER_CREATE_INVALIDATION_REASON_UUID_INVALID",
+                          "message": "Field `invalidation_reason_uuid` must be a valid UUID.",
+                          "source": "validation"
+                        }
+                      ]
+                    }
+                  },
+                  "invalid_system_uuid": {
+                    "summary": "system_uuid is not a UUID",
+                    "value": {
+                      "endpoint": "POST /api/v1/user",
+                      "error_type": "validation_error",
+                      "errors": [
+                        {
+                          "code": "USER_009",
+                          "details": {
+                            "ctx": {
+                              "error": "invalid character: expected an optional prefix of `urn:uuid:` followed by [0-9a-fA-F-], found `n` at 1"
+                            },
+                            "input": "not-a-uuid",
+                            "loc": [
+                              "body",
+                              "system_uuid"
+                            ],
+                            "type": "uuid_parsing"
+                          },
+                          "field": "system_uuid",
+                          "key": "USER_CREATE_SYSTEM_UUID_INVALID",
+                          "message": "Field `system_uuid` must be a valid UUID.",
+                          "source": "validation"
+                        }
+                      ]
+                    }
+                  },
+                  "invalid_timezone": {
+                    "summary": "Invalid timezone name",
+                    "value": {
+                      "endpoint": "POST /api/v1/user",
+                      "error_type": "validation_error",
+                      "errors": [
+                        {
+                          "code": "USER_007",
+                          "details": {
+                            "ctx": {
+                              "error": {}
+                            },
+                            "input": "Europe/Mscow",
+                            "loc": [
+                              "body",
+                              "timezone"
+                            ],
+                            "type": "value_error"
+                          },
+                          "field": "timezone",
+                          "key": "USER_CREATE_TIMEZONE_INVALID",
+                          "message": "Field `timezone` must be a valid IANA timezone.",
+                          "source": "validation"
+                        }
+                      ]
+                    }
+                  },
+                  "is_row_invalid_not_int": {
+                    "summary": "is_row_invalid has wrong type",
+                    "value": {
+                      "endpoint": "POST /api/v1/user",
+                      "error_type": "validation_error",
+                      "errors": [
+                        {
+                          "code": "USER_011",
+                          "details": {
+                            "input": "yes",
+                            "loc": [
+                              "body",
+                              "is_row_invalid"
+                            ],
+                            "type": "int_parsing"
+                          },
+                          "field": "is_row_invalid",
+                          "key": "USER_CREATE_IS_ROW_INVALID_TYPE",
+                          "message": "Field `is_row_invalid` must be an integer.",
+                          "source": "validation"
+                        }
+                      ]
+                    }
+                  },
+                  "is_row_invalid_too_large": {
+                    "summary": "is_row_invalid is above maximum",
+                    "value": {
+                      "endpoint": "POST /api/v1/user",
+                      "error_type": "validation_error",
+                      "errors": [
+                        {
+                          "code": "USER_013",
+                          "details": {
+                            "ctx": {
+                              "le": 1
+                            },
+                            "input": 2,
+                            "loc": [
+                              "body",
+                              "is_row_invalid"
+                            ],
+                            "type": "less_than_equal"
+                          },
+                          "field": "is_row_invalid",
+                          "key": "USER_CREATE_IS_ROW_INVALID_MAX",
+                          "message": "Field `is_row_invalid` must be <= 1.",
+                          "source": "validation"
+                        }
+                      ]
+                    }
+                  },
+                  "is_row_invalid_too_small": {
+                    "summary": "is_row_invalid is below minimum",
+                    "value": {
+                      "endpoint": "POST /api/v1/user",
+                      "error_type": "validation_error",
+                      "errors": [
+                        {
+                          "code": "USER_012",
+                          "details": {
+                            "ctx": {
+                              "ge": 0
+                            },
+                            "input": -1,
+                            "loc": [
+                              "body",
+                              "is_row_invalid"
+                            ],
+                            "type": "greater_than_equal"
+                          },
+                          "field": "is_row_invalid",
+                          "key": "USER_CREATE_IS_ROW_INVALID_MIN",
+                          "message": "Field `is_row_invalid` must be >= 0.",
+                          "source": "validation"
+                        }
+                      ]
+                    }
+                  },
+                  "missing_full_name": {
+                    "summary": "Missing required field full_name",
+                    "value": {
+                      "endpoint": "POST /api/v1/user",
+                      "error_type": "validation_error",
+                      "errors": [
+                        {
+                          "code": "USER_003",
+                          "details": {
+                            "input": {
+                              "system_user_id": "1",
+                              "system_uuid": "b2c3d4e5-0002-4000-8000-000000000002",
+                              "timezone": "UTC"
+                            },
+                            "loc": [
+                              "body",
+                              "full_name"
+                            ],
+                            "type": "missing"
+                          },
+                          "field": "full_name",
+                          "key": "USER_CREATE_FULL_NAME_REQUIRED",
+                          "message": "Field `full_name` is required.",
+                          "source": "validation"
+                        }
+                      ]
+                    }
+                  },
+                  "missing_system_user_id": {
+                    "summary": "Missing required field system_user_id",
+                    "value": {
+                      "endpoint": "POST /api/v1/user",
+                      "error_type": "validation_error",
+                      "errors": [
+                        {
+                          "code": "USER_001",
+                          "details": {
+                            "input": {
+                              "full_name": "Ivan Petrov",
+                              "timezone": "UTC"
+                            },
+                            "loc": [
+                              "body",
+                              "system_user_id"
+                            ],
+                            "type": "missing"
+                          },
+                          "field": "system_user_id",
+                          "key": "USER_CREATE_SYSTEM_USER_ID_REQUIRED",
+                          "message": "Field `system_user_id` is required.",
+                          "source": "validation"
+                        }
+                      ]
+                    }
+                  },
+                  "missing_system_uuid": {
+                    "summary": "Missing required field system_uuid",
+                    "value": {
+                      "endpoint": "POST /api/v1/user",
+                      "error_type": "validation_error",
+                      "errors": [
+                        {
+                          "code": "USER_025",
+                          "details": {
+                            "input": {
+                              "full_name": "Ivan Petrov",
+                              "system_user_id": "1",
+                              "timezone": "UTC"
+                            },
+                            "loc": [
+                              "body",
+                              "system_uuid"
+                            ],
+                            "type": "missing"
+                          },
+                          "field": "system_uuid",
+                          "key": "USER_CREATE_SYSTEM_UUID_REQUIRED",
+                          "message": "Field `system_uuid` is required.",
+                          "source": "validation"
+                        }
+                      ]
+                    }
+                  },
+                  "timezone_too_long": {
+                    "summary": "timezone exceeds max length",
+                    "value": {
+                      "endpoint": "POST /api/v1/user",
+                      "error_type": "validation_error",
+                      "errors": [
+                        {
+                          "code": "USER_008",
+                          "details": {
+                            "ctx": {
+                              "max_length": 64
+                            },
+                            "input": "Europe/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+                            "loc": [
+                              "body",
+                              "timezone"
+                            ],
+                            "type": "string_too_long"
+                          },
+                          "field": "timezone",
+                          "key": "USER_CREATE_TIMEZONE_TOO_LONG",
+                          "message": "Field `timezone` exceeds max length.",
+                          "source": "validation"
+                        }
+                      ]
+                    }
+                  },
+                  "username_too_long": {
+                    "summary": "username exceeds max length",
+                    "value": {
+                      "endpoint": "POST /api/v1/user",
+                      "error_type": "validation_error",
+                      "errors": [
+                        {
+                          "code": "USER_006",
+                          "details": {
+                            "ctx": {
+                              "max_length": 255
+                            },
+                            "input": "uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu",
+                            "loc": [
+                              "body",
+                              "username"
+                            ],
+                            "type": "string_too_long"
+                          },
+                          "field": "username",
+                          "key": "USER_CREATE_USERNAME_TOO_LONG",
+                          "message": "Field `username` exceeds max length.",
+                          "source": "validation"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              }
+            },
+            "description": "Request validation errors for all supported user create field rules.",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "rate_limit_exceeded": {
+                    "summary": "Too many requests",
+                    "value": {
+                      "code": "COMMON_429",
+                      "key": "SECURITY_RATE_LIMIT_EXCEEDED",
+                      "message": "Too many requests. Retry later.",
+                      "source": "security"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Per-client request rate limit exceeded.",
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds until request can be retried.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Limit": {
+                "description": "Rate-limit ceiling for current window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Remaining": {
+                "description": "Remaining requests in current window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Create user",
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/api/v1/user/{system_uuid}/{system_user_id}": {
+      "get": {
+        "description": "Returns user profile by composite key `(system_uuid, system_user_id)`.\n\n### Example request (curl)\n```bash\ncurl -X GET 'http://127.0.0.1:8000/api/v1/user/b2c3d4e5-0002-4000-8000-000000000002/2' \\\n  -H 'accept: application/json' \\\n  -H 'X-API-Key: ....'\n```",
+        "operationId": "getUserBySystemUserId",
+        "parameters": [
+          {
+            "description": "Source system UUID (`systems.system_uuid`).",
+            "in": "path",
+            "name": "system_uuid",
+            "required": true,
+            "schema": {
+              "description": "Source system UUID (`systems.system_uuid`).",
+              "format": "uuid",
+              "title": "System Uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "system_user_id",
+            "required": true,
+            "schema": {
+              "maxLength": 36,
+              "minLength": 1,
+              "title": "System User Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Optional correlation id. If you send **X-Request-Id**, the same value is returned in the response header and written to server logs as **request_id** (JSON logs / Elasticsearch). If omitted, the server generates a UUID.",
+            "in": "header",
+            "name": "X-Request-Id",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserCreateResponse"
+                }
+              }
+            },
+            "description": "Successful Response",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "auth_required": {
+                    "summary": "Auth header required",
+                    "value": {
+                      "code": "COMMON_401",
+                      "key": "SECURITY_AUTH_REQUIRED",
+                      "message": "Missing or invalid API key in header `X-API-Key`.",
+                      "source": "security"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Missing or invalid API key header.",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "user_not_found": {
+                    "summary": "No user with given system_user_id",
+                    "value": {
+                      "code": "USER_404",
+                      "key": "USER_NOT_FOUND",
+                      "message": "User with this `system_user_id` and `system_uuid` was not found.",
+                      "source": "business"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "User not found.",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "rate_limit_exceeded": {
+                    "summary": "Too many requests",
+                    "value": {
+                      "code": "COMMON_429",
+                      "key": "SECURITY_RATE_LIMIT_EXCEEDED",
+                      "message": "Too many requests. Retry later.",
+                      "source": "security"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Per-client request rate limit exceeded.",
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds until request can be retried.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Limit": {
+                "description": "Rate-limit ceiling for current window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Remaining": {
+                "description": "Remaining requests in current window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Get user by system_uuid and system_user_id",
+        "tags": [
+          "User"
+        ]
+      },
+      "patch": {
+        "description": "Updates only the fields present in the JSON body; omitted fields stay unchanged. Requires `Idempotency-Key`. Use `PUT` for a full replacement of mutable fields.\n\n### Example request (curl)\n```bash\ncurl -X PATCH 'http://127.0.0.1:8000/api/v1/user/b2c3d4e5-0002-4000-8000-000000000002/2' \\\n  -H 'accept: application/json' \\\n  -H 'Content-Type: application/json' \\\n  -H 'X-API-Key: ....' \\\n  -H 'Idempotency-Key: patch-user-sample-1' \\\n  -d '{\"full_name\":\"Maria Petrova\"}'\n```",
+        "operationId": "patchUserBySystemUserId",
+        "parameters": [
+          {
+            "description": "Source system UUID (`systems.system_uuid`).",
+            "in": "path",
+            "name": "system_uuid",
+            "required": true,
+            "schema": {
+              "description": "Source system UUID (`systems.system_uuid`).",
+              "format": "uuid",
+              "title": "System Uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "system_user_id",
+            "required": true,
+            "schema": {
+              "maxLength": 36,
+              "minLength": 1,
+              "title": "System User Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required idempotency key for write deduplication. Use printable ASCII only (no Cyrillic/Unicode).",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "description": "Required idempotency key for write deduplication. Use printable ASCII only (no Cyrillic/Unicode).",
+              "maxLength": 128,
+              "minLength": 1,
+              "pattern": "^[ -~]+$",
+              "title": "Idempotency-Key",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Optional correlation id. If you send **X-Request-Id**, the same value is returned in the response header and written to server logs as **request_id** (JSON logs / Elasticsearch). If omitted, the server generates a UUID.",
+            "in": "header",
+            "name": "X-Request-Id",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "examples": {
+                "single_field": {
+                  "summary": "Change full name only",
+                  "value": {
+                    "full_name": "Maria Petrova"
+                  }
+                },
+                "timezone_only": {
+                  "summary": "Change timezone only",
+                  "value": {
+                    "timezone": "America/New_York"
+                  }
+                }
+              },
+              "schema": {
+                "$ref": "#/components/schemas/UserPatchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserCreateResponse"
+                }
+              }
+            },
+            "description": "User updated successfully.",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "idempotency_key_missing": {
+                    "summary": "Missing Idempotency-Key header",
+                    "value": {
+                      "code": "COMMON_400",
+                      "key": "IDEMPOTENCY_KEY_REQUIRED",
+                      "message": "Missing required `Idempotency-Key` header for write operation.",
+                      "source": "business"
+                    }
+                  },
+                  "patch_body_empty": {
+                    "summary": "No fields to patch",
+                    "value": {
+                      "code": "USER_102",
+                      "key": "USER_PATCH_BODY_EMPTY",
+                      "message": "PATCH body must include at least one field to update.",
+                      "source": "business"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Business validation failure.",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "auth_required": {
+                    "summary": "Auth header required",
+                    "value": {
+                      "code": "COMMON_401",
+                      "key": "SECURITY_AUTH_REQUIRED",
+                      "message": "Missing or invalid API key in header `X-API-Key`.",
+                      "source": "security"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Missing or invalid API key header.",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "user_not_found": {
+                    "summary": "No user with given system_user_id",
+                    "value": {
+                      "code": "USER_404",
+                      "key": "USER_NOT_FOUND",
+                      "message": "User with this `system_user_id` and `system_uuid` was not found.",
+                      "source": "business"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "User not found.",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "idempotency_conflict": {
+                    "summary": "Idempotency key conflict",
+                    "value": {
+                      "code": "COMMON_409",
+                      "key": "IDEMPOTENCY_KEY_REUSED_WITH_DIFFERENT_PAYLOAD",
+                      "message": "Idempotency key was already used with another payload.",
+                      "source": "business"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Idempotency key was reused with different payload.",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "body_too_large": {
+                    "summary": "Body size limit exceeded",
+                    "value": {
+                      "code": "COMMON_413",
+                      "key": "SECURITY_REQUEST_BODY_TOO_LARGE",
+                      "message": "Request body exceeds configured maximum size.",
+                      "source": "security"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Request body exceeds configured maximum size.",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "invalid_timezone": {
+                    "summary": "Invalid timezone name (patch)",
+                    "value": {
+                      "endpoint": "PATCH /api/v1/user/b2c3d4e5-0002-4000-8000-000000000002/134tg",
+                      "error_type": "validation_error",
+                      "errors": [
+                        {
+                          "code": "USER_018",
+                          "details": {
+                            "ctx": {
+                              "error": {}
+                            },
+                            "input": "Europe/Mscow",
+                            "loc": [
+                              "body",
+                              "timezone"
+                            ],
+                            "type": "value_error"
+                          },
+                          "field": "timezone",
+                          "key": "USER_UPDATE_TIMEZONE_INVALID",
+                          "message": "Field `timezone` must be a valid IANA timezone.",
+                          "source": "validation"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              }
+            },
+            "description": "Request validation errors for user patch body rules.",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "rate_limit_exceeded": {
+                    "summary": "Too many requests",
+                    "value": {
+                      "code": "COMMON_429",
+                      "key": "SECURITY_RATE_LIMIT_EXCEEDED",
+                      "message": "Too many requests. Retry later.",
+                      "source": "security"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Per-client request rate limit exceeded.",
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds until request can be retried.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Limit": {
+                "description": "Rate-limit ceiling for current window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Remaining": {
+                "description": "Remaining requests in current window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Partially update user by system_uuid and system_user_id",
+        "tags": [
+          "User"
+        ]
+      },
+      "put": {
+        "description": "Updates mutable profile fields for an existing user. Requires `Idempotency-Key` for safe retry semantics.\n\n### Example request (curl)\n```bash\ncurl -X PUT 'http://127.0.0.1:8000/api/v1/user/b2c3d4e5-0002-4000-8000-000000000002/2' \\\n  -H 'accept: application/json' \\\n  -H 'Content-Type: application/json' \\\n  -H 'X-API-Key: ....' \\\n  -H 'Idempotency-Key: update-user-sample-1' \\\n  -d '{\"full_name\":\"Ivan Petrov\",\"timezone\":\"Europe/Moscow\",\"is_row_invalid\":0}'\n```",
+        "operationId": "updateUserBySystemUserId",
+        "parameters": [
+          {
+            "description": "Source system UUID (`systems.system_uuid`).",
+            "in": "path",
+            "name": "system_uuid",
+            "required": true,
+            "schema": {
+              "description": "Source system UUID (`systems.system_uuid`).",
+              "format": "uuid",
+              "title": "System Uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "system_user_id",
+            "required": true,
+            "schema": {
+              "maxLength": 36,
+              "minLength": 1,
+              "title": "System User Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required idempotency key for write deduplication. Use printable ASCII only (no Cyrillic/Unicode).",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": true,
+            "schema": {
+              "description": "Required idempotency key for write deduplication. Use printable ASCII only (no Cyrillic/Unicode).",
+              "maxLength": 128,
+              "minLength": 1,
+              "pattern": "^[ -~]+$",
+              "title": "Idempotency-Key",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Optional correlation id. If you send **X-Request-Id**, the same value is returned in the response header and written to server logs as **request_id** (JSON logs / Elasticsearch). If omitted, the server generates a UUID.",
+            "in": "header",
+            "name": "X-Request-Id",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "examples": {
+                "default": {
+                  "summary": "Update profile fields",
+                  "value": {
+                    "full_name": "Ivan Petrov",
+                    "is_row_invalid": 0,
+                    "system_uuid": "b2c3d4e5-0002-4000-8000-000000000002",
+                    "timezone": "Europe/Moscow",
+                    "username": "ipetrov"
+                  }
+                },
+                "minimal": {
+                  "summary": "Required fields only",
+                  "value": {
+                    "full_name": "Ivan Petrov",
+                    "is_row_invalid": 0,
+                    "timezone": "UTC"
+                  }
+                }
+              },
+              "schema": {
+                "$ref": "#/components/schemas/UserUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserCreateResponse"
+                }
+              }
+            },
+            "description": "User updated successfully.",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "auth_required": {
+                    "summary": "Auth header required",
+                    "value": {
+                      "code": "COMMON_401",
+                      "key": "SECURITY_AUTH_REQUIRED",
+                      "message": "Missing or invalid API key in header `X-API-Key`.",
+                      "source": "security"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Missing or invalid API key header.",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "user_not_found": {
+                    "summary": "No user with given system_user_id",
+                    "value": {
+                      "code": "USER_404",
+                      "key": "USER_NOT_FOUND",
+                      "message": "User with this `system_user_id` and `system_uuid` was not found.",
+                      "source": "business"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "User not found.",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "idempotency_conflict": {
+                    "summary": "Idempotency key conflict",
+                    "value": {
+                      "code": "COMMON_409",
+                      "key": "IDEMPOTENCY_KEY_REUSED_WITH_DIFFERENT_PAYLOAD",
+                      "message": "Idempotency key was already used with another payload.",
+                      "source": "business"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Idempotency key was reused with different payload.",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "body_too_large": {
+                    "summary": "Body size limit exceeded",
+                    "value": {
+                      "code": "COMMON_413",
+                      "key": "SECURITY_REQUEST_BODY_TOO_LARGE",
+                      "message": "Request body exceeds configured maximum size.",
+                      "source": "security"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Request body exceeds configured maximum size.",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "invalid_timezone": {
+                    "summary": "Invalid timezone name (update)",
+                    "value": {
+                      "endpoint": "PUT /api/v1/user/b2c3d4e5-0002-4000-8000-000000000002/134tg",
+                      "error_type": "validation_error",
+                      "errors": [
+                        {
+                          "code": "USER_018",
+                          "details": {
+                            "ctx": {
+                              "error": {}
+                            },
+                            "input": "Europe/Mscow",
+                            "loc": [
+                              "body",
+                              "timezone"
+                            ],
+                            "type": "value_error"
+                          },
+                          "field": "timezone",
+                          "key": "USER_UPDATE_TIMEZONE_INVALID",
+                          "message": "Field `timezone` must be a valid IANA timezone.",
+                          "source": "validation"
+                        }
+                      ]
+                    }
+                  },
+                  "missing_full_name": {
+                    "summary": "Missing required field full_name (update)",
+                    "value": {
+                      "endpoint": "PUT /api/v1/user/b2c3d4e5-0002-4000-8000-000000000002/134tg",
+                      "error_type": "validation_error",
+                      "errors": [
+                        {
+                          "code": "USER_014",
+                          "details": {
+                            "input": {
+                              "is_row_invalid": 0,
+                              "timezone": "UTC"
+                            },
+                            "loc": [
+                              "body",
+                              "full_name"
+                            ],
+                            "type": "missing"
+                          },
+                          "field": "full_name",
+                          "key": "USER_UPDATE_FULL_NAME_REQUIRED",
+                          "message": "Field `full_name` is required.",
+                          "source": "validation"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              }
+            },
+            "description": "Request validation errors for user update body rules.",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "rate_limit_exceeded": {
+                    "summary": "Too many requests",
+                    "value": {
+                      "code": "COMMON_429",
+                      "key": "SECURITY_RATE_LIMIT_EXCEEDED",
+                      "message": "Too many requests. Retry later.",
+                      "source": "security"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description": "Per-client request rate limit exceeded.",
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds until request can be retried.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Limit": {
+                "description": "Rate-limit ceiling for current window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-RateLimit-Remaining": {
+                "description": "Remaining requests in current window.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "Update user by system_uuid and system_user_id",
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/internal/telemetry/docs-search": {
+      "post": {
+        "description": "Persist one docs-search client telemetry event to the technical SQLite DB.\n\nArgs:\n    payload: Normalized telemetry event body from docs frontend JS.\n\nReturns:\n    Lightweight acknowledgement body.",
+        "operationId": "ingestDocsSearchTelemetryEvent",
+        "parameters": [
+          {
+            "description": "Optional correlation id. If you send **X-Request-Id**, the same value is returned in the response header and written to server logs as **request_id** (JSON logs / Elasticsearch). If omitted, the server generates a UUID.",
+            "in": "header",
+            "name": "X-Request-Id",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocsSearchTelemetryIngestRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Ingestdocssearchtelemetryevent",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missing_event": {
+                    "summary": "Missing required event field",
+                    "value": {
+                      "endpoint": "POST /internal/telemetry/docs-search",
+                      "error_type": "validation_error",
+                      "errors": [
+                        {
+                          "code": "USER_001",
+                          "details": {
+                            "input": {
+                              "emitted_at_ms": 1776420000000,
+                              "query_id": "q_123",
+                              "session_id": "s_123"
+                            },
+                            "loc": [
+                              "body",
+                              "event"
+                            ],
+                            "type": "missing"
+                          },
+                          "field": "event",
+                          "key": "field_required",
+                          "message": "Field required",
+                          "source": "validation"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              }
+            },
+            "description": "Validation error for malformed telemetry payload.",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Ingest docs search telemetry event",
+        "tags": [
+          "System"
+        ]
+      }
+    },
+    "/internal/telemetry/docs-search/metrics": {
+      "get": {
+        "description": "Return docs-search KPI aggregates for the requested rolling time window.\n\nArgs:\n    window_minutes: Rolling aggregation horizon (default 24 hours).\n\nReturns:\n    KPI summary with zero-result rate, query CTR, and time-to-first-success percentiles.",
+        "operationId": "getDocsSearchTelemetryMetrics",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "window_minutes",
+            "required": false,
+            "schema": {
+              "default": 1440,
+              "title": "Window Minutes",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Optional correlation id. If you send **X-Request-Id**, the same value is returned in the response header and written to server logs as **request_id** (JSON logs / Elasticsearch). If omitted, the server generates a UUID.",
+            "in": "header",
+            "name": "X-Request-Id",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocsSearchTelemetryMetricsResponse"
+                }
+              }
+            },
+            "description": "Successful Response",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get docs search KPI summary",
+        "tags": [
+          "System"
+        ]
+      }
+    },
+    "/live": {
+      "get": {
+        "description": "Liveness: process is up (no dependency checks).\n\nReturns:\n    Payload with ``status=\"alive\"`` and current ``app_env``.",
+        "operationId": "getLiveProbe",
+        "parameters": [
+          {
+            "description": "Optional correlation id. If you send **X-Request-Id**, the same value is returned in the response header and written to server logs as **request_id** (JSON logs / Elasticsearch). If omitted, the server generates a UUID.",
+            "in": "header",
+            "name": "X-Request-Id",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LiveResponse"
+                }
+              }
+            },
+            "description": "Successful Response",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Liveness probe",
+        "tags": [
+          "System"
+        ]
+      }
+    },
+    "/ready": {
+      "get": {
+        "description": "Readiness probe including database connectivity and latency budget.\n\nReturns:\n    ``ReadyResponse`` with HTTP 200 when ready, or HTTP 503 with the same schema\n    when the DB check fails or exceeds the timeout.",
+        "operationId": "getReadyProbe",
+        "parameters": [
+          {
+            "description": "Optional correlation id. If you send **X-Request-Id**, the same value is returned in the response header and written to server logs as **request_id** (JSON logs / Elasticsearch). If omitted, the server generates a UUID.",
+            "in": "header",
+            "name": "X-Request-Id",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadyResponse"
+                }
+              }
+            },
+            "description": "Successful Response",
+            "headers": {
+              "X-Request-Id": {
+                "description": "Correlation id for this HTTP request\u2014echo of **X-Request-Id** from the request or a server-generated UUID. Use it to match browser or Swagger calls to log lines and Kibana.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Readiness probe",
+        "tags": [
+          "System"
+        ]
+      }
+    }
+  },
+  "tags": [
+    {
+      "description": "Operational endpoints (live/ready/metrics and platform metadata).",
+      "name": "System"
+    },
+    {
+      "description": "User identity lifecycle endpoints with idempotency and contract-driven errors.",
+      "name": "User"
+    }
+  ]
+}

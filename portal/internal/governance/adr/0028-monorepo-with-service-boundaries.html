@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en" data-portal="internal" data-theme="light"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ADR 0028 · Monorepo with service boundaries · Study App Internal</title>
+  <script>(function(){try{var v=localStorage.getItem("docs-theme-preference");if(v==="dark"||v==="light")document.documentElement.setAttribute("data-theme",v);}catch(e){}})();</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..900&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="../../../../frontend/portal/assets_v2/favicon.svg">
+  <link rel="stylesheet" href="../../../../frontend/portal/assets_v2/runtime/internal/entry.css">
+</head>
+<body data-page-type="reference" class="docs-shell" data-maintainer-ids="16fc8b78537109162984a2fdbef6e142" data-service="none" data-lifecycle="published" data-updated="2026-06-09" data-role="architect">
+
+  <header class="topbar" role="banner">
+    <a class="topbar__brand" href="../../index.html"><span aria-hidden="true">🛠</span><span>Study App · Internal</span></a>
+    <nav class="topbar__breadcrumbs" aria-label="Breadcrumb">
+      <ol class="docs-breadcrumbs__list">
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="../../index.html">Internal</a></li>
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="../index.html">Governance</a></li>
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="index.html">ADR</a></li>
+        <li class="docs-breadcrumbs__item" aria-current="page">0028</li>
+      </ol>
+    </nav>
+    <div class="topbar__spacer"></div>
+    <div class="topbar__actions">
+      <button class="docs-theme-toggle" type="button" aria-label="Toggle theme"></button>
+    </div>
+  </header>
+
+  <aside data-component="sidebar" data-nav-src="../../../../frontend/portal/assets_v2/ui-kit/mocks/nav-tree-internal.json" aria-label="Section navigation"></aside>
+
+  <main class="container">
+    <article class="docs-prose">
+
+      <header class="page-head">
+        <div class="home-hero__eyebrow">
+          <span class="docs-pill docs-pill--info">ADR · 0028</span>
+          <div class="lifecycle-popover">
+            <a class="docs-pill docs-pill--success" href="0018-adr-lifecycle-ratification-and-badges.html">Accepted</a>
+            <div class="lifecycle-popover__panel" role="tooltip">
+              <span class="lifecycle-popover__title">Lifecycle · this ADR</span>
+              <ol class="lifecycle-popover__stages">
+                <li class="lifecycle-popover__stage" data-stage="decision">
+                  <span class="lifecycle-popover__stage-label">Decision</span>
+                  <ul class="lifecycle-popover__states">
+                    <li>Proposed</li>
+                    <li class="is-current">Accepted</li>
+                    <li>Superseded</li>
+                  </ul>
+                </li>
+                <li class="lifecycle-popover__stage" data-stage="documentation">
+                  <span class="lifecycle-popover__stage-label">Documentation</span>
+                  <ul class="lifecycle-popover__states">
+                    <li>Draft</li>
+                    <li>Ready</li>
+                  </ul>
+                </li>
+                <li class="lifecycle-popover__stage" data-stage="implementation">
+                  <span class="lifecycle-popover__stage-label">Implementation</span>
+                  <ul class="lifecycle-popover__states">
+                    <li>Not started</li>
+                    <li>In progress</li>
+                    <li class="is-current">Done</li>
+                  </ul>
+                </li>
+              </ol>
+              <a class="lifecycle-popover__link" href="0018-adr-lifecycle-ratification-and-badges.html">Open ADR 0018 →</a>
+            </div>
+          </div>
+        </div>
+        <h1>Monorepo with service boundaries</h1>
+        <div id="docs-top-nav"></div>
+        <p class="lede">
+          One repository, three service trees under <code>services/{api,portal,monitoring}</code> — independent deploy units (per-service Dockerfile, per-service CI job) without the multi-repo coordination tax.
+        </p>
+      </header>
+
+      <section aria-labelledby="metadata-h">
+        <h2 id="metadata-h">Metadata</h2>
+        <dl class="svc-meta svc-meta--neutral">
+          <dt>ADR</dt>
+          <dd><code>0028</code> — Monorepo with service boundaries</dd>
+          <dt>Category</dt>
+          <dd>workflow</dd>
+          <dt>Owner</dt>
+          <dd><a href="../../team/people/ivan-boyarkin/index.html">Ivan Boyarkin</a></dd>
+          <dt>Decided on</dt>
+          <dd><time datetime="2026-05-07">2026-05-07</time></dd>
+          <dt>Last reviewed</dt>
+          <dd><time datetime="2026-06-09">2026-06-09</time></dd>
+        </dl>
+      </section>
+
+      <section aria-labelledby="context-h">
+        <h2 id="context-h">Context</h2>
+        <p>The repository currently mixes three runtime concerns under a single Python application tree:</p>
+        <ul>
+          <li>The <strong>HTTP API</strong> (FastAPI in <code>app/</code>): public <code>/api/v1</code> surface, governed by <a href="0004-api-versioning-policy.html">ADR 0004</a> and <a href="0007-openapi-governance-and-usability-standard.html">ADR 0007</a>.</li>
+          <li>The <strong>documentation portal</strong> (static HTML/CSS/JS under <code>services/portal/</code>): ADRs, RFCs, internal docs, OpenAPI explorer, search index — Docs as Code per <a href="0001-docs-as-code.html">ADR 0001</a>.</li>
+          <li>The <strong>monitoring stack</strong> (Prometheus / Grafana / optional local Elasticsearch + Kibana): observability wiring per <a href="0009-health-readiness-and-observability.html">ADR 0009</a> and <a href="0023-structured-logging-and-local-elasticsearch.html">ADR 0023</a>.</li>
+        </ul>
+        <p>These concerns share one image, one CI pipeline, and one deploy unit. That coupling is fine while the project is small, but it blocks several Senior-SA-level evolutions: the portal cannot be served by a static-asset host independently of the API, the monitoring stack cannot be promoted or rolled back without the API, and the API image carries documentation bytes it never needs at runtime.</p>
+        <p>A textbook answer would be to split into <strong>three GitHub repositories</strong> (one per service) and glue them together via a GitHub Organization or a meta-repo with submodules. For a solo project under the 2026-05-30 deadline, that path multiplies CI configuration, version-skew risk, contract-sync ceremony, and cross-repo refactor cost — all without changing what actually runs in containers. We need a decision that captures the architectural separation without the multi-repo tax.</p>
+      </section>
+
+      <section aria-labelledby="decision-h">
+        <h2 id="decision-h">Decision</h2>
+        <ul>
+          <li>Keep a <strong>single GitHub repository</strong>. Move from the flat <code>app/</code> + <code>services/portal/</code> layout to a service-rooted layout under <code>services/</code>:
+            <ul>
+              <li><code>services/api/</code> — FastAPI runtime: routes, models, migrations, the existing container entrypoint (<code>services/api/scripts/container_entrypoint.sh</code>), and the API <code>Dockerfile</code>.</li>
+              <li><code>services/portal/</code> — static documentation site (today's <code>services/portal/</code> tree), served by a thin static-asset image (e.g. <code>nginx:alpine</code>) with its own <code>Dockerfile</code>.</li>
+              <li><code>services/monitoring/</code> — Prometheus / Grafana / Elasticsearch / Kibana / Filebeat configuration, dashboards, and any custom exporters; its own <code>Dockerfile</code> only when an exporter or sidecar is built locally.</li>
+            </ul>
+          </li>
+          <li>Each service is an <strong>independent deploy unit</strong>: its own <code>Dockerfile</code>, its own dependency surface (<code>requirements.txt</code> for the API, <code>package.json</code> only if a build step is added later, declarative configs for monitoring), and its own image tag in GHCR per <a href="0021-continuous-delivery-github-actions-and-ghcr.html">ADR 0021</a>.</li>
+          <li>A top-level <code>docker-compose.yml</code> orchestrates the three services for local development. The existing observability compose file is consolidated into <code>services/monitoring/</code> and referenced from the root compose via <code>extends</code> or <code>include</code>.</li>
+          <li>CI runs as a <strong>matrix job per service</strong>: each service builds, tests, and lints independently. Cross-cutting checks (link checker, OpenAPI contract tests, ADR/RFC link checker) stay at repo root and run once.</li>
+          <li>Governance artifacts — ADRs, RFCs, runbooks, audits, CHANGELOG, OpenAPI baseline — remain <strong>outside <code>services/</code></strong>. They are repo-wide concerns, not per-service concerns. Their physical home is <code>services/portal/internal/governance/{adr,rfc,audit,backlog}/</code> and <code>services/portal/internal/sre/runbooks/</code> per <a href="../../../internal/governance/rfc/0004-public-vs-internal-documentation-portal-ia.html">RFC 0004</a>; the OpenAPI baseline lives at <code>services/portal/public/reference/api/</code> per <a href="0007-openapi-governance-and-usability-standard.html">ADR 0007</a>; <code>services/portal/CHANGELOG.md</code> stays at <code>services/portal/</code> root as the release journal. (Amendment 2026-05-08 — replaces the original specific path list with the underlying invariant "outside <code>services/</code>".)</li>
+          <li>This decision <strong>does not</strong> introduce a separate database per service, a service mesh, or inter-service RPC. The portal remains a pure static site; monitoring scrapes the API over HTTP. Splits beyond that are out of scope and need their own ADRs.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="scope-h">
+        <h2 id="scope-h">Scope</h2>
+        <ul>
+          <li>In scope: repository folder layout, per-service <code>Dockerfile</code> rule, root <code>docker-compose.yml</code> orchestration, CI matrix shape, governance-artifact placement.</li>
+          <li>Out of scope: splitting the database, introducing inter-service RPC or a message bus, replacing SQLite with PostgreSQL (see <a href="0015-container-image.html">ADR 0015</a> trade-offs), choosing a static-host runtime image for the portal, multi-cluster or multi-region deployment topology.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="alternatives-h">
+        <h2 id="alternatives-h">Alternatives considered</h2>
+        <div class="docs-card-grid">
+          <article class="docs-card">
+            <div class="docs-card__head"><h3 class="docs-card__title">Status quo: single flat layout, one Dockerfile, one CI pipeline</h3></div>
+            <div class="docs-card__body">
+              <p><strong>Pros:</strong> zero migration cost; familiar layout for the current solo workflow.</p>
+              <p><strong>Cons:</strong> no enforced boundary between API, portal, and monitoring — any of them can pull the others into their dependency closure. Cannot release the portal without rebuilding the API image. Forces a future "true microservices" migration to do the folder split <em>and</em> the repo split at the same time, doubling risk.</p>
+            </div>
+          </article>
+          <article class="docs-card">
+            <div class="docs-card__head"><h3 class="docs-card__title">Multi-repo + GitHub Organization</h3></div>
+            <div class="docs-card__body">
+              <p><strong>Pros:</strong> textbook microservices answer; per-repo permissions, issues, and release cycles; each repo looks "small".</p>
+              <p><strong>Cons:</strong> triples the CI configuration; ADR/OpenAPI/CHANGELOG must either duplicate across repos or live in a fourth "governance" repo with its own sync problem; cross-cutting refactors (e.g. a new error-code in <a href="0003-error-contract-governance.html">ADR 0003</a>) become 3-PR coordination exercises; contract drift between API and portal becomes a real risk because they are no longer edited in the same diff. Net cost is high for one engineer with a 2026-05-30 deadline.</p>
+            </div>
+          </article>
+          <article class="docs-card">
+            <div class="docs-card__head"><h3 class="docs-card__title">Multi-repo + meta-repo with git submodules</h3></div>
+            <div class="docs-card__body">
+              <p><strong>Pros:</strong> keeps a single "front door" repo for orchestration and governance; per-service repos can evolve independently.</p>
+              <p><strong>Cons:</strong> submodules are notoriously hostile to day-to-day editing — every cross-cutting change is at least four commits in two repos with a pinned-SHA dance; CI for the platform repo must clone submodules and reproduce per-service tests; contributors need to understand <code>git submodule update --init --recursive</code> and submodule branch tracking. Power tool, wrong size for this project.</p>
+            </div>
+          </article>
+          <article class="docs-card">
+            <div class="docs-card__head"><h3 class="docs-card__title">Single repo, single Dockerfile, multiple <code>CMD</code> targets</h3></div>
+            <div class="docs-card__body">
+              <p><strong>Pros:</strong> minimal change; one image to push to GHCR.</p>
+              <p><strong>Cons:</strong> portal and monitoring drag the API runtime closure into their image; image size and security surface stay coupled; no independent deploy unit, just an illusion of one. Defeats the architectural goal.</p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section aria-labelledby="consequences-h">
+        <h2 id="consequences-h">Consequences</h2>
+        <div class="docs-card-grid docs-card-grid--stack">
+          <article class="docs-card" data-tone="success">
+            <div class="docs-card__head"><h3 class="docs-card__title">Positive</h3><span class="docs-pill docs-pill--success">wins</span></div>
+            <div class="docs-card__body">
+              <ul>
+                <li><strong>Independent deploy units without multi-repo overhead.</strong> Each service has its own image tag and can be promoted, rolled back, or scaled without touching the others.</li>
+                <li><strong>Smaller, cleaner images.</strong> The API image stops shipping <code>services/portal/</code>; the portal image stops shipping Python; monitoring is configuration, not a Python runtime.</li>
+                <li><strong>Cross-cutting changes stay one PR.</strong> An error-code rename, an ADR update, or an OpenAPI contract bump still lands in a single commit, reviewed against all affected services.</li>
+                <li><strong>Defensible at the Senior SA bar.</strong> The decision matches the layout used by Google, Meta, Uber, and other monorepo-first organizations; the trade-off table above is the answer to the interview question "why not microservices in separate repos?"</li>
+                <li><strong>Migration path is incremental.</strong> The folder split is a no-behavior-change refactor; per-service Dockerfiles, compose, and CI matrix can land in subsequent PRs.</li>
+              </ul>
+            </div>
+          </article>
+          <article class="docs-card" data-tone="warn">
+            <div class="docs-card__head"><h3 class="docs-card__title">Trade-offs</h3><span class="docs-pill docs-pill--warn">costs</span></div>
+            <div class="docs-card__body">
+              <p>Two canonical tradeoffs (the four-bullet list is preserved as the «what changes» surface; these two name the accepted-cost-vs-gain shape). Shape from <a href="../../handbook/sa/tradeoff-disclosure.html">Tradeoff disclosure</a>.</p>
+              <ul class="rail-list" data-tone="rose">
+                <li><strong>Folder boundary, not repo boundary.</strong> We gain the architectural separation (independent deploy units, per-service image, per-service CI matrix) without the multi-repo coordination tax (3× CI config, 3-PR refactors, contract-drift risk). We lose the explicit «only this team can touch this service» guarantee that separate repos enforce via permissions. We accept it because the per-team isolation is not the constraint for a solo project; folder boundaries + <code>CODEOWNERS</code> is the lighter mechanism that scales when team grows.</li>
+                <li><strong>Path depth + tooling-config churn.</strong> We gain «refactor without renaming images» — the API stays at <code>services/api/</code> through every internal restructure. We lose flat <code>app/main.py</code> imports and accept that Ruff, pytest, pip-audit, and the link checker need path updates. We accept it because the depth cost is paid once at the rename, while the «one repo, three deploy units» benefit pays every release.</li>
+              </ul>
+              <p>The implementation-level costs (CI runtime, coarse permissions, partial-microservices answer) are documented in the original four bullets above — kept verbatim as the operational checklist contributors will hit during the four-phase rollout.</p>
+            </div>
+          </article>
+        </div>
+        <h3>Revisit — would we do this again?</h3>
+        <p><strong>This ADR is Proposed; the «would we do this again?» question is forward-looking until Phase 1 ships.</strong> The clearest day-one investment we would commit to alongside Phase 1:</p>
+        <ul class="rail-list" data-tone="info">
+          <li><strong>Add a <code>CODEOWNERS</code> file at the same commit as Phase 1's folder split.</strong> Today the codebase has no <code>CODEOWNERS</code>; the day a second contributor lands is the day folder-as-boundary needs reviewer enforcement. Adding it during the folder split is free; retrofitting it later is friction.</li>
+        </ul>
+
+      </section>
+
+      <section aria-labelledby="compatibility-h">
+        <h2 id="compatibility-h">Compatibility and migration</h2>
+        <ul>
+          <li>Backward-compatibility impact: <strong>medium</strong>. Public HTTP contract is unchanged; image names and tooling paths change. Consumers of the GHCR image (per <a href="0021-continuous-delivery-github-actions-and-ghcr.html">ADR 0021</a>) must switch from the single <code>study-app</code> tag to <code>study-app-api</code>, <code>study-app-portal</code>, <code>study-app-monitoring</code>.</li>
+          <li>Migration plan (phased, each phase shippable on its own):
+            <ol>
+              <li><strong>Phase 1 — folder split, no behavior change.</strong> Move <code>app/</code> to <code>services/api/app/</code>, leave <code>services/portal/</code> in place but add a placeholder <code>services/portal/</code> that points at <code>../../docs/</code>; update Ruff, pytest, pip-audit, and the link checker for the new paths. CI stays green with the existing single image.</li>
+              <li><strong>Phase 2 — per-service Dockerfiles.</strong> Move the API <code>Dockerfile</code> into <code>services/api/</code>, add a static-asset <code>Dockerfile</code> in <code>services/portal/</code>, add a thin <code>services/monitoring/Dockerfile</code> only if a sidecar is built locally.</li>
+              <li><strong>Phase 3 — root <code>docker-compose.yml</code>.</strong> Replace ad-hoc local orchestration with a single root compose file that brings up all three services. Consolidate the existing observability compose into <code>services/monitoring/</code>.</li>
+              <li><strong>Phase 4 — CI matrix per service.</strong> Split the CI workflow so each service builds and tests independently; cross-cutting checks (link checker, OpenAPI tests) stay at root.</li>
+            </ol>
+            Each phase is a separate backlog item; this ADR ratifies the destination, not the schedule. <strong>Status (2026-06-09):</strong> all four phases landed in the BL-065 PR (Phase 1 — folder split; Phase 2 — per-service Makefiles + per-service scripts; Phase 3 — root <code>docker-compose.yml</code>; Phase 4 — CI matrix + per-service GHCR tag scheme). Boundary enforcement: <code>_shared/scripts/check_service_imports.py</code> pre-commit hook (master C11).</li>
+            <li>Rollback strategy: revert the offending phase. Phase 1 is a pure rename, fully reversible by <code>git revert</code>; later phases are additive (new Dockerfiles, new CI jobs) and can be reverted without touching the API runtime.</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="implementation-h">
+          <h2 id="implementation-h">Implementation plan</h2>
+          <ol>
+            <li>Create the four backlog items (one per migration phase) under <a href="../../../internal/governance/backlog/index.html">services/portal/internal/governance/backlog/</a> with explicit acceptance criteria; do not bundle them into one ticket.</li>
+            <li>Land Phase 1 first — folder split with no behavior change — and verify <code>make verify</code> stays green per <a href="0008-make-command-taxonomy-and-workflow-entrypoints.html">ADR 0008</a>.</li>
+            <li>Land Phase 2 (per-service Dockerfiles) only after the API image still passes <a href="0015-container-image.html">ADR 0015</a> validation (<code>docker build</code>, <code>/live</code> 200).</li>
+            <li>Land Phase 3 (root compose) and update developer onboarding under <code>services/portal/internal/handbook/developer/</code> in the same PR.</li>
+            <li>Land Phase 4 (CI matrix) only after Phase 2 + 3 are stable for at least one release per <a href="0017-branch-naming-and-repository-workflow.html">ADR 0017</a>.</li>
+          </ol>
+        </section>
+
+        <section aria-labelledby="validation-h">
+          <h2 id="validation-h">Validation</h2>
+          <ul>
+            <li>Technical checks: <code>make verify</code> remains green after each phase; per-service <code>docker build</code> succeeds in Phase 2; root <code>docker compose up</code> brings up the API, the portal, and Prometheus + Grafana in Phase 3; CI matrix shows three independent green jobs in Phase 4.</li>
+            <li>Operational checks: <code>/live</code> and <code>/ready</code> on the API service still match <a href="0009-health-readiness-and-observability.html">ADR 0009</a>; structured-logging contract holds per <a href="0023-structured-logging-and-local-elasticsearch.html">ADR 0023</a>; SLOs from <a href="0011-slo-sla-error-budget.html">ADR 0011</a> are unaffected.</li>
+            <li>Documentation updates: this ADR linked from <a href="index.html">services/portal/internal/governance/adr/index.html</a>; <a href="../../../../../CHANGELOG.md">services/portal/CHANGELOG.md</a> records the proposal; per-phase backlog items in <a href="../../../internal/governance/backlog/index.html">services/portal/internal/governance/backlog/</a>; developer onboarding under <code>services/portal/internal/handbook/developer/</code> updated when Phase 3 lands.</li>
+          </ul>
+        </section>
+
+        <footer class="docs-history" aria-label="History">
+          <h2 class="docs-history__title">History</h2>
+          <ul class="docs-history__list">
+            <li class="docs-history__row">
+              <span class="docs-history__date">2026-06-10</span>
+              <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm">@ivan</a>
+              <span class="docs-history__note">Tooling layout consolidated under a single <code>tools/</code> tree (post-merge follow-up on top of the BL-065 four-phase landing). Cross-cutting governance/LLM/checker scripts moved <code>_shared/scripts/</code> → <code>tools/governance/</code>; per-service helpers moved <code>services/{api,portal,monitoring}/scripts/</code> → <code>tools/{api,docs,monitoring}/</code>. <code>services/api/scripts/</code> retained only for <code>container_entrypoint.sh</code> (the one artefact that ships inside the container image). Boundary checker map untouched — <code>tools/</code> is shared by design and scoped outside the per-service walk. Also restored the dedicated telemetry SQLite (<code>var/tech/telemetry.db</code> via new <code>TELEMETRY_SQLITE_DB_PATH</code> env var) after a transient merge of <code>docs_search_events</code> into the main API DB during BL-065 cleanup.</span>
+            </li>
+            <li class="docs-history__row">
+              <span class="docs-history__date">2026-06-09</span>
+              <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm">@ivan</a>
+              <span class="docs-history__note">Implementation state flipped Not started → Done. All four phases landed in the BL-065 PR (one branch, 14 atomic commits). Phase 2: <code>services/{api,monitoring,portal}/Makefile</code> + per-service <code>scripts/</code> dirs (master plan C4 + C8 thin) + <code>_shared/scripts/</code> for cross-cutting tooling (master C5). Phase 3: root <code>docker-compose.yml</code> that <code>include:</code>s <code>services/monitoring/docker-compose.observability.yml</code> and adds the API service with health-check + per-service GHCR tagging. Phase 4: CI matrix fans out `api/portal/monitoring/cross-cutting` slots (fail-fast=false). Boundary: <code>_shared/scripts/check_service_imports.py</code> AST-walker as pre-commit hook (master C11) — denies any <code>from app.…</code> outside <code>services/api/</code>. Package rename <code>app</code> → <code>api</code> (master C7) deferred to a separate branch; the boundary checker is forward-compatible (one map entry edit).</span>
+            </li>
+            <li class="docs-history__row">
+              <span class="docs-history__date">2026-06-09</span>
+              <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm">@ivan</a>
+              <span class="docs-history__note">Ratified Proposed → Accepted on Phase 1 landing (<a href="../backlog/index.html">BL-065</a>): <code>app/</code> → <code>services/api/app/</code>, <code>alembic/</code> + <code>alembic.ini</code> → <code>services/api/</code>, <code>ops/{prometheus,grafana,filebeat}/</code> + <code>docker-compose.{logging,observability}.yml</code> → <code>services/monitoring/</code>, root <code>Dockerfile</code> + <code>requirements.txt</code> + <code>.dockerignore</code> + <code>scripts/container_entrypoint.sh</code> → <code>services/api/</code>. Added <code>CODEOWNERS</code> at the same commit per § Would we do this again. Phases 2–4 remain as separate follow-ups.</span>
+            </li>
+            <li class="docs-history__row">
+              <span class="docs-history__date">2026-06-01</span>
+              <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm">@ivan</a>
+              <span class="docs-history__note">Substance audit-pass on a Proposed ADR. Status pill → <code>.lifecycle-popover</code> with <code>is-current</code> on Proposed; <code>§ Trade-offs</code> kept the original four operational bullets and added two canonical «we gain X, we lose Y, we accept Z» entries; new <code>§ Would we do this again?</code> (forward-looking until Phase 1 ships) proposing <code>CODEOWNERS</code> at Phase 1. Inline <code>style</code> stripped. The <code>§ Alternatives considered</code> was already in the canonical «Why considered / Why rejected» template — kept verbatim.</span>
+            </li>
+            <li class="docs-history__row">
+              <span class="docs-history__date">2026-05-17</span>
+              <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm">@ivan</a>
+              <span class="docs-history__note">Migrated to UI Kit v3.</span>
+            </li>
+            <li class="docs-history__row">
+              <span class="docs-history__date">2026-05-08</span>
+              <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm">@ivan</a>
+              <span class="docs-history__note">Amended Decision §governance bullet from the original specific path list (<code>services/portal/internal/governance/adr/</code>, <code>services/portal/internal/governance/rfc/</code>, <code>services/portal/internal/sre/runbooks/</code>, <code>services/portal/internal/governance/audits/</code>) to the underlying invariant "outside <code>services/</code>", with physical paths now under <code>services/portal/internal/governance/</code> and <code>services/portal/internal/sre/runbooks/</code> per <a href="../../../internal/governance/rfc/0004-public-vs-internal-documentation-portal-ia.html">RFC 0004</a>. Architectural separation unchanged.</span>
+            </li>
+            <li class="docs-history__row">
+              <span class="docs-history__date">2026-05-07</span>
+              <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm">@ivan</a>
+              <span class="docs-history__note">Proposed: monorepo with service boundaries (<code>services/{api,portal,monitoring}</code>) as the architectural alternative to a multi-repo microservice split.</span>
+            </li>
+          </ul>
+        </footer>
+
+      </article>
+    </main>
+
+    <aside class="docs-toc" aria-label="On this page"></aside>
+    <button data-component="toc-fab" type="button" aria-label="On this page" aria-expanded="false"></button>
+
+    <script type="module" src="../../../../frontend/portal/assets_v2/runtime/internal/entry.js"></script>
+
+  </body></html>

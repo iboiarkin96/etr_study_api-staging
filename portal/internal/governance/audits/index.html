@@ -1,0 +1,188 @@
+<!doctype html>
+<html data-portal="internal" data-theme="light" lang="en"><head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <title>Audits · Study App Internal</title>
+  <script>(function(){try{var v=localStorage.getItem("docs-theme-preference");if(v==="dark"||v==="light")document.documentElement.setAttribute("data-theme",v);}catch(e){}})();</script>
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..900&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <link href="../../../../frontend/portal/assets_v2/favicon.svg" rel="icon" type="image/svg+xml">
+  <link href="../../../../frontend/portal/assets_v2/runtime/internal/entry.css" rel="stylesheet">
+</head>
+<body class="docs-shell" data-lifecycle="published" data-maintainer-ids="16fc8b78537109162984a2fdbef6e142" data-page-type="landing-section" data-role="" data-service="none" data-updated="2026-06-06">
+  <header class="topbar" role="banner">
+    <a class="topbar__brand" href="../../index.html"><span aria-hidden="true">🛠</span><span>Study App · Internal</span></a>
+    <nav aria-label="Breadcrumb" class="topbar__breadcrumbs">
+      <ol class="docs-breadcrumbs__list">
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="../../index.html">Internal</a></li>
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="../index.html">Governance</a></li>
+        <li aria-current="page" class="docs-breadcrumbs__item">Audits</li>
+      </ol>
+    </nav>
+    <div class="topbar__spacer"></div>
+    <div class="topbar__actions">
+      <button aria-label="Toggle theme" class="docs-theme-toggle" type="button"></button>
+    </div>
+  </header>
+  <aside aria-label="Section navigation" data-component="sidebar" data-nav-src="../../../../frontend/portal/assets_v2/ui-kit/mocks/nav-tree-internal.json"></aside>
+  <main class="container">
+    <!-- ── Hero ────────────────────────────────────────────────────────── -->
+    <section class="home-hero home-hero--section">
+      <div class="home-hero__layout">
+        <div class="home-hero__copy">
+          <p class="home-hero__eyebrow">Internal · Governance · Audits</p>
+          <h1 class="home-hero__title">
+            Architecture &amp; quality <span class="home-hero__title-accent">assessments</span>
+          </h1>
+          <div id="docs-top-nav"></div>
+          <p class="home-hero__tagline">
+            Maturity assessments for this repo. Each report lists reference practices (Table 1), scores how
+            we match them (Table 2) with a short justification per row, then scoring arithmetic, Top-5 gaps with
+            workflow status, and history. ADRs record <em>decisions</em>; assessments record <em>how we compare</em>
+            to common practice on a given date. For the template, see the
+            <a href="../../handbook/sa/templates/audit.html">audit template</a>.
+          </p>
+          <div class="home-hero__stats">
+            <span class="docs-pill docs-pill--info">5 categories</span>
+            <span class="docs-pill docs-pill--success">8 reports</span>
+          </div>
+        </div>
+        <dl aria-label="Audits snapshot" class="home-hero__tickers">
+          <div class="home-hero__ticker" data-tone="accent"><dt>Categories</dt><dd>5</dd></div>
+          <div class="home-hero__ticker" data-tone="done"><dt>Reports</dt><dd>8</dd></div>
+          <div class="home-hero__ticker" data-tone="progress"><dt>Highest</dt><dd>8.1</dd></div>
+          <div class="home-hero__ticker" data-tone="todo"><dt>Lowest</dt><dd>4.8</dd></div>
+        </dl>
+      </div>
+    </section>
+    <!-- ── Toolbar: category filter ───────────────────────────────────── -->
+    <div class="cockpit-toolbar">
+      <div class="cockpit-filter-row">
+        <span class="cockpit-toolbar__label">Category</span>
+        <div aria-label="Category" data-component="multi-filter-chips" data-default="all" data-state-key="category">
+          <button aria-pressed="true" class="docs-chip docs-chip--filter" data-value="all" type="button">All</button>
+          <button aria-pressed="false" class="docs-chip docs-chip--filter" data-value="api" type="button">REST API</button>
+          <button aria-pressed="false" class="docs-chip docs-chip--filter" data-value="bug-audit" type="button">Bug audit</button>
+          <button aria-pressed="false" class="docs-chip docs-chip--filter" data-value="dx" type="button">Documentation</button>
+          <button aria-pressed="false" class="docs-chip docs-chip--filter" data-value="maturity" type="button">Project maturity</button>
+          <button aria-pressed="false" class="docs-chip docs-chip--filter" data-value="ui-ux" type="button">UI/UX</button>
+        </div>
+      </div>
+      <div class="cockpit-filter-row">
+        <span class="cockpit-toolbar__label">View</span>
+        <div aria-label="View" class="docs-view-switcher" data-component="view-switcher" data-default="by-group" data-storage-key="audit-view" data-target="#audit-views">
+          <button class="docs-view-switcher__btn" data-view="by-group" type="button">
+            <svg aria-hidden="true" fill="none" viewBox="0 0 13 13">
+              <rect height="5.5" rx="1" stroke="currentColor" stroke-width="1.2" width="5.5" x="0.5" y="0.5"></rect>
+              <rect height="5.5" rx="1" stroke="currentColor" stroke-width="1.2" width="5.5" x="7" y="0.5"></rect>
+              <rect height="5.5" rx="1" stroke="currentColor" stroke-width="1.2" width="5.5" x="0.5" y="7"></rect>
+              <rect height="5.5" rx="1" stroke="currentColor" stroke-width="1.2" width="5.5" x="7" y="7"></rect>
+            </svg>
+            By group
+          </button>
+          <button class="docs-view-switcher__btn" data-view="table" type="button">
+            <svg aria-hidden="true" fill="none" viewBox="0 0 13 13">
+              <rect height="3" rx="1" stroke="currentColor" stroke-width="1.2" width="12" x="0.5" y="0.5"></rect>
+              <rect height="3" rx="1" stroke="currentColor" stroke-width="1.2" width="12" x="0.5" y="5"></rect>
+              <rect height="3" rx="1" stroke="currentColor" stroke-width="1.2" width="12" x="0.5" y="9.5"></rect>
+            </svg>
+            Table
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="cockpit-views" data-view="by-group" id="audit-views">
+      <div class="cockpit-view cockpit-view--by-group">
+        <section aria-labelledby="api-h" data-group="api" id="api">
+          <h2 id="api-h">REST / HTTP API assessments</h2>
+          <p>Maturity assessment for the HTTP API surface — OpenAPI contract, idempotency, security headers, observability, and CI quality. Full list: <a href="api/index.html">REST API assessments index</a>.</p>
+          <ol class="spine-grid"><li><a class="spine-tile" data-tone="info" href="api/2026-05-25-rest-api-assessment.html"><div class="spine-tile__head"><span class="spine-tile__index">2026-05-25 · ≈ 6.0 / 10</span></div><h3 class="spine-tile__title">REST API Assessment</h3><p class="spine-tile__body">24-row Table 1/2 covering OpenAPI, error envelope, idempotency, rate limiting, observability and CI quality.</p><div class="spine-tile__foot"><span class="spine-tile__cta">Open</span><span aria-hidden="true" class="spine-tile__arrow">→</span></div></a></li></ol>
+        </section>
+        <section aria-labelledby="bug-h" data-group="bug-audit" id="bug-audit">
+          <h2 id="bug-h">Bug audit</h2>
+          <p>Maturity assessment of bug intake, severity, triage SLA, fix-and-verify loop, and root-cause learning. Full list: <a href="bugs/index.html">Bug audit index</a>.</p>
+          <ol class="spine-grid"><li><a class="spine-tile" data-tone="info" href="bugs/2026-05-25-portal-bug-audit.html"><div class="spine-tile__head"><span class="spine-tile__index">2026-05-25 · ≈ 4.8 / 10</span></div><h3 class="spine-tile__title">Portal Bug Audit</h3><p class="spine-tile__body">20-row Table 1/2 covering intake, severity ladder, triage SLA, regression coverage, post-mortem feedback, and aging dashboards.</p><div class="spine-tile__foot"><span class="spine-tile__cta">Open</span><span aria-hidden="true" class="spine-tile__arrow">→</span></div></a></li></ol>
+        </section>
+        <section aria-labelledby="dx-h" data-group="dx" id="dx">
+          <h2 id="dx-h">Documentation experience (DX)</h2>
+          <p>Maturity assessment focused on Diátaxis fit, authoring tooling, navigation, search, mobile contract, and the feedback loop. Full list: <a href="docs/index.html">DX assessments index</a>.</p>
+          <ol class="spine-grid"><li><a class="spine-tile" data-tone="info" href="docs/2026-06-12-documentation-experience-assessment.html"><div class="spine-tile__head"><span class="spine-tile__index">2026-06-12 · ≈ 8.1 / 10</span></div><h3 class="spine-tile__title">DX Assessment — 2026-06-12</h3><p class="spine-tile__body">v3 compact format. 25-practice rubric (Δ vs 2026-06-02) + 10-axis Architect's Bar. Pagefind closed the search stall; operational liveness slipped B → B−. ~B+ on the Bar.</p><div class="spine-tile__foot"><span class="spine-tile__cta">Open</span><span aria-hidden="true" class="spine-tile__arrow">→</span></div></a></li><li><a class="spine-tile" data-tone="info" href="docs/2026-06-02-documentation-experience-assessment.html"><div class="spine-tile__head"><span class="spine-tile__index">2026-06-02 · ≈ 7.9 / 10</span></div><h3 class="spine-tile__title">DX Assessment — 2026-06-02</h3><p class="spine-tile__body">v2 «Architect's Bar» format. 25-practice rubric + 10-axis Bar + meta-roadmap. Vol. 2 substance push closed twelve gaps; surfaced two CRITICAL. ~B+ on the Bar.</p><div class="spine-tile__foot"><span class="spine-tile__cta">Open</span><span aria-hidden="true" class="spine-tile__arrow">→</span></div></a></li><li><a class="spine-tile" data-tone="info" href="docs/2026-05-25-documentation-experience-assessment.html"><div class="spine-tile__head"><span class="spine-tile__index">2026-05-25 · ≈ 7.3 / 10</span></div><h3 class="spine-tile__title">DX Assessment — 2026-05-25</h3><p class="spine-tile__body">Initial canonical-template DX assessment. 25-row Table 1/2 across Diátaxis, templates, navigation, search, mobile, feedback and CI gates.</p><div class="spine-tile__foot"><span class="spine-tile__cta">Open</span><span aria-hidden="true" class="spine-tile__arrow">→</span></div></a></li></ol>
+        </section>
+        <section aria-labelledby="maturity-h" data-group="maturity" id="maturity">
+          <h2 id="maturity-h">Project maturity</h2>
+          <p>Maturity assessment of the engineering programme — architecture governance, delivery, reliability, security, observability, and people — benchmarked against Google SRE, GitLab Handbook, DORA, OWASP ASVS, and CNCF. Full list: <a href="maturity/index.html">Project maturity assessments index</a>.</p>
+          <ol class="spine-grid"><li><a class="spine-tile" data-tone="info" href="maturity/2026-05-25-project-maturity-assessment.html"><div class="spine-tile__head"><span class="spine-tile__index">2026-05-25 · ≈ 6.3 / 10</span></div><h3 class="spine-tile__title">Project Maturity Assessment</h3><p class="spine-tile__body">25-row Table 1/2 across governance, delivery, reliability, security, observability and people.</p><div class="spine-tile__foot"><span class="spine-tile__cta">Open</span><span aria-hidden="true" class="spine-tile__arrow">→</span></div></a></li></ol>
+        </section>
+        <section aria-labelledby="uiux-h" data-group="ui-ux" id="ui-ux">
+          <h2 id="uiux-h">UI/UX assessments</h2>
+          <p>Maturity assessment focused on tokens, components, page templates, status vocabulary, mobile contract, and motion grammar. Full list: <a href="ui-ux/index.html">UI/UX assessments index</a>.</p>
+          <ol class="spine-grid"><li><a class="spine-tile" data-tone="info" href="ui-ux/2026-06-04-ui-ux-consistency-assessment.html"><div class="spine-tile__head"><span class="spine-tile__index">2026-06-04 · 6.4 / 10</span></div><h3 class="spine-tile__title">UI/UX Consistency Assessment</h3><p class="spine-tile__body">Full-corpus audit (464 pages). Design-language map, 25-row Table 1/2, cost-to-add KPI, top-7 gaps, benchmark deltas.</p><div class="spine-tile__foot"><span class="spine-tile__cta">Open</span><span aria-hidden="true" class="spine-tile__arrow">→</span></div></a></li><li><a class="spine-tile" data-tone="info" href="ui-ux/2026-05-25-ui-ux-assessment.html"><div class="spine-tile__head"><span class="spine-tile__index">2026-05-25 · 6.7 / 10</span></div><h3 class="spine-tile__title">UI/UX Assessment</h3><p class="spine-tile__body">24-row Table 1/2 across tokens, components, templates, chrome, motion, theme, a11y and polish/assurance. Superseded.</p><div class="spine-tile__foot"><span class="spine-tile__cta">Open</span><span aria-hidden="true" class="spine-tile__arrow">→</span></div></a></li></ol>
+        </section>
+      </div>
+      <!-- ── Table view ─────────────────────────────────────────────────── -->
+      <div class="cockpit-view cockpit-view--table">
+        <div class="docs-table-wrap">
+          <table class="docs-table docs-table--zebra docs-table--sticky-head">
+            <thead><tr><th>Assessment</th><th>Summary</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr data-group="api"><td><a href="api/2026-05-25-rest-api-assessment.html">REST API — 2026-05-25</a></td><td>24-row Table 1/2 covering OpenAPI, error envelope, idempotency, security headers, observability and CI; overall ≈ 6.0 / 10.</td><td><span class="docs-pill docs-pill--success">Active</span></td></tr>
+              <tr data-group="bug-audit"><td><a href="bugs/2026-05-25-portal-bug-audit.html">Bug audit — 2026-05-25</a></td><td>20-row Table 1/2 covering intake, severity, triage SLA, repro, regression coverage, post-mortem and aging dashboards; overall ≈ 4.8 / 10.</td><td><span class="docs-pill docs-pill--success">Active</span></td></tr>
+              <tr data-group="dx"><td><a href="docs/2026-06-12-documentation-experience-assessment.html">DX — 2026-06-12</a></td><td>v3 compact: 25-practice rubric (Δ vs 2026-06-02) + 10-axis Architect's Bar. Pagefind closed the search stall, operational liveness slipped B → B−; weighted total ≈ 8.1 / 10, ~B+ on the Bar.</td><td><span class="docs-pill docs-pill--success">Active</span></td></tr>
+              <tr data-group="dx"><td><a href="docs/2026-06-02-documentation-experience-assessment.html">DX — 2026-06-02</a></td><td>v2 «Architect's Bar» three-track format. 25-row rubric + 10-axis Bar + meta-roadmap. Vol. 2 substance push closed twelve gaps; weighted total ≈ 7.9 / 10, ~B+ on the Bar.</td><td><span class="docs-pill docs-pill--neutral">Superseded</span></td></tr>
+              <tr data-group="dx"><td><a href="docs/2026-05-25-documentation-experience-assessment.html">DX — 2026-05-25</a></td><td>Initial canonical-template DX assessment. 25-row Table 1/2 across Diátaxis, templates, navigation, search, mobile contract, feedback and CI; weighted total ≈ 7.3 / 10.</td><td><span class="docs-pill docs-pill--neutral">Superseded</span></td></tr>
+              <tr data-group="maturity"><td><a href="maturity/2026-05-25-project-maturity-assessment.html">Project Maturity — 2026-05-25</a></td><td>25-row Table 1/2 across governance, delivery, reliability, security, observability and people; weighted total ≈ 6.3 / 10.</td><td><span class="docs-pill docs-pill--success">Active</span></td></tr>
+              <tr data-group="ui-ux"><td><a href="ui-ux/2026-06-04-ui-ux-consistency-assessment.html">UI/UX Consistency — 2026-06-04</a></td><td>Full-corpus audit (464 pages). Design-language map, 25-row Table 1/2, status vocabulary matrix, cost-to-add KPI, top-7 gaps, benchmark deltas; weighted total 6.4 / 10.</td><td><span class="docs-pill docs-pill--success">Active</span></td></tr>
+              <tr data-group="ui-ux"><td><a href="ui-ux/2026-05-25-ui-ux-assessment.html">UI/UX — 2026-05-25</a></td><td>24-row Table 1/2 across tokens, components, templates, chrome, motion, theme, a11y and assurance; weighted total ≈ 6.7 / 10.</td><td><span class="docs-pill docs-pill--neutral">Superseded</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div><!-- /#audit-views -->
+    <footer aria-label="History" class="docs-history">
+      <h2 class="docs-history__title">History</h2>
+      <ul class="docs-history__list">
+        <li class="docs-history__row">
+          <span class="docs-history__date">2026-06-12</span>
+          <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm"></a>
+          <span class="docs-history__note">Added DX Assessment 2026-06-12 (v3 compact, overall ≈ 8.1 / 10, ~B+ on the Architect's Bar). Backfilled the missing 2026-06-02 DX tile; marked DX 2026-05-25 and 2026-06-02 as Superseded. Report count: 6 → 8. Highest score 7.3 → 8.1.</span>
+        </li>
+        <li class="docs-history__row">
+          <span class="docs-history__date">2026-06-04</span>
+          <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm"></a>
+          <span class="docs-history__note">Added UI/UX Consistency Assessment 2026-06-04 (full-corpus, 464 pages, 6.4 / 10). Marked UI/UX 2026-05-25 as Superseded. Report count: 5 → 6.</span>
+        </li>
+        <li class="docs-history__row">
+          <span class="docs-history__date">2026-05-25</span>
+          <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm"></a>
+          <span class="docs-history__note">Reset the audits hub: deleted all legacy reports, dropped the accessibility category, and published one canonical-template assessment per remaining category (api, bugs, docs, maturity, ui-ux).</span>
+        </li>
+      </ul>
+    </footer>
+  </main>
+  <aside aria-label="On this page" class="docs-toc"></aside>
+  <button aria-expanded="false" aria-label="On this page" data-component="toc-fab" type="button"></button>
+  <script>
+    /* Category filter glue — listens for `multifilterchange` from
+    multi-filter-chips and toggles `hidden` on every [data-group]
+    element (sections in By-group view + rows in Table view). Runs
+    once on load so deep-links like `#category=ui-ux` are honoured. */
+    (function () {
+    function apply(value) {
+    var v = value || "all";
+    document.querySelectorAll("#audit-views [data-group]").forEach(function (el) {
+    el.hidden = !(v === "all" || el.getAttribute("data-group") === v);
+    });
+    }
+    window.addEventListener("multifilterchange", function (e) {
+    if (e.detail && e.detail.key === "category") apply(e.detail.value);
+    });
+    try {
+    var params = new URLSearchParams((location.hash || "").replace(/^#/, ""));
+    apply(params.get("category") || "all");
+    } catch (_) { apply("all"); }
+    })();
+  </script>
+  <script src="../../../../frontend/portal/assets_v2/runtime/internal/entry.js" type="module"></script>
+
+</body></html>

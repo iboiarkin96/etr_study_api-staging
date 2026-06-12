@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en" data-portal="internal" data-theme="light"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ADR 0010 · Environment Profiles and Config Governance · Study App Internal</title>
+  <script>(function(){try{var v=localStorage.getItem("docs-theme-preference");if(v==="dark"||v==="light")document.documentElement.setAttribute("data-theme",v);}catch(e){}})();</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..900&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="../../../../frontend/portal/assets_v2/favicon.svg">
+  <link rel="stylesheet" href="../../../../frontend/portal/assets_v2/runtime/internal/entry.css">
+</head>
+<body data-page-type="reference" class="docs-shell" data-maintainer-ids="16fc8b78537109162984a2fdbef6e142" data-service="none" data-lifecycle="published" data-updated="2026-06-06" data-role="architect">
+
+  <header class="topbar" role="banner">
+    <a class="topbar__brand" href="../../index.html"><span aria-hidden="true">🛠</span><span>Study App · Internal</span></a>
+    <nav class="topbar__breadcrumbs" aria-label="Breadcrumb">
+      <ol class="docs-breadcrumbs__list">
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="../../index.html">Internal</a></li>
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="../index.html">Governance</a></li>
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="index.html">ADR</a></li>
+        <li class="docs-breadcrumbs__item" aria-current="page">0010</li>
+      </ol>
+    </nav>
+    <div class="topbar__spacer"></div>
+    <div class="topbar__actions">
+      <button class="docs-theme-toggle" type="button" aria-label="Toggle theme"></button>
+    </div>
+  </header>
+
+  <aside data-component="sidebar" data-nav-src="../../../../frontend/portal/assets_v2/ui-kit/mocks/nav-tree-internal.json" aria-label="Section navigation"></aside>
+
+  <main class="container">
+    <article class="docs-prose">
+
+      <header class="page-head">
+        <div class="home-hero__eyebrow">
+          <span class="docs-pill docs-pill--info">ADR · 0010</span>
+          <div class="lifecycle-popover">
+            <a class="docs-pill docs-pill--success" href="0018-adr-lifecycle-ratification-and-badges.html">Accepted</a>
+            <div class="lifecycle-popover__panel" role="tooltip">
+              <span class="lifecycle-popover__title">Lifecycle · this ADR</span>
+              <ol class="lifecycle-popover__stages">
+                <li class="lifecycle-popover__stage" data-stage="decision">
+                  <span class="lifecycle-popover__stage-label">Decision</span>
+                  <ul class="lifecycle-popover__states">
+                    <li>Proposed</li>
+                    <li class="is-current">Accepted</li>
+                    <li>Superseded</li>
+                  </ul>
+                </li>
+                <li class="lifecycle-popover__stage" data-stage="documentation">
+                  <span class="lifecycle-popover__stage-label">Documentation</span>
+                  <ul class="lifecycle-popover__states">
+                    <li>Draft</li>
+                    <li>Ready</li>
+                  </ul>
+                </li>
+                <li class="lifecycle-popover__stage" data-stage="implementation">
+                  <span class="lifecycle-popover__stage-label">Implementation</span>
+                  <ul class="lifecycle-popover__states">
+                    <li>Not started</li>
+                    <li>In progress</li>
+                    <li>Done</li>
+                  </ul>
+                </li>
+              </ol>
+              <a class="lifecycle-popover__link" href="0018-adr-lifecycle-ratification-and-badges.html">Open ADR 0018 →</a>
+            </div>
+          </div>
+        </div>
+        <h1>Environment Profiles and Config Governance</h1>
+        <div id="docs-top-nav"></div>
+        <p class="lede">
+          Three explicit profiles (<code>dev</code>, <code>qa</code>, <code>prod</code>), one committed template, layered loading, and strict validation that blocks unsafe settings outside dev.
+        </p>
+      </header>
+
+      <section aria-labelledby="metadata-h">
+        <h2 id="metadata-h">Metadata</h2>
+        <dl class="svc-meta svc-meta--neutral">
+          <dt>ADR</dt>
+          <dd><code>0010</code> — Environment Profiles and Config Governance</dd>
+          <dt>Category</dt>
+          <dd>security</dd>
+          <dt>Owner</dt>
+          <dd><a href="../../team/people/ivan-boyarkin/index.html">Ivan Boyarkin</a></dd>
+          <dt>Decided on</dt>
+          <dd><time datetime="2026-05-17">2026-05-17</time></dd>
+          <dt>Last reviewed</dt>
+          <dd><time datetime="2026-06-01">2026-06-01</time></dd>
+        </dl>
+      </section>
+
+      <section aria-labelledby="context-h">
+        <h2 id="context-h">Context</h2>
+        <p><strong>Why this matters:</strong> Twelve-factor style apps read config from the environment so the same build can run in dev, staging, and prod. If profiles are fuzzy, teams accidentally ship debug logging, mock auth, or open CORS to production—often discovered by incident, not review.</p>
+        <p>We need explicit profiles (<code>dev</code>, <code>qa</code>, <code>prod</code>), one documented template, and validation that rejects unsafe combinations in non-dev environments.</p>
+      </section>
+
+      <section aria-labelledby="decision-h">
+        <h2 id="decision-h">Decision</h2>
+        <ul>
+          <li>Adopt explicit environment profiles: <code>dev</code>, <code>qa</code>, <code>prod</code> only.</li>
+          <li>Single committed template: <code>env/example</code> (copy to <code>.env</code> via <code>make env-init</code>).</li>
+          <li>Load configuration in layers: <code>.env</code> -&gt; <code>env/&lt;APP_ENV&gt;</code> -&gt; optional <code>ENV_FILE</code>.</li>
+          <li>Automated tests use <code>APP_ENV=qa</code> (not a separate profile). Legacy <code>APP_ENV=test</code> maps to <code>qa</code>.</li>
+          <li>Normalize legacy aliases (for example <code>local</code> -&gt; <code>dev</code>).</li>
+          <li>Expose effective profile in <code>GET /live</code> as <code>app_env</code>.</li>
+          <li>Enforce strict runtime validation for unsafe settings in <code>qa/prod</code>.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="scope-h">
+        <h2 id="scope-h">Scope</h2>
+        <ul>
+          <li><strong>In scope:</strong> the conventions, rules, and artefacts named in the Decision section above.</li>
+          <li><strong>Out of scope:</strong> any system, process, or surface not explicitly listed here.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="alternatives-h">
+        <h2 id="alternatives-h">Alternatives considered</h2>
+        <p>Three alternatives were evaluated before adopting three explicit profiles + fail-fast validation. Each is real (another serious team in the industry uses it) and explicitly rejected with a reason rooted in our constraints.</p>
+        <div class="docs-card-grid docs-card-grid--stack">
+          <article class="docs-card" data-tone="warn">
+            <div class="docs-card__head"><h3 class="docs-card__title">No profiles — every setting is an independent env var</h3><span class="docs-pill docs-pill--danger">rejected</span></div>
+            <div class="docs-card__body">
+              <p><strong>Why considered:</strong> the strict twelve-factor reading. No profile name, no validation rules tied to it — every behaviour is one explicit env var that the operator sets. Maximum composability.</p>
+              <p><strong>Why rejected:</strong> with N independent env vars, every unsafe combination is reachable by accident. The matrix of «which combinations are valid?» grows exponentially and lives in nobody's head. A profile name collapses the matrix to «which row of the validation table am I on?», which is a tractable question. Composability we do not need is paid in clarity we do.</p>
+            </div>
+          </article>
+          <article class="docs-card" data-tone="warn">
+            <div class="docs-card__head"><h3 class="docs-card__title">External secret/config service (Vault, AWS Parameter Store, GCP Secret Manager)</h3><span class="docs-pill docs-pill--danger">rejected</span></div>
+            <div class="docs-card__body">
+              <p><strong>Why considered:</strong> the «secrets and config out of the env entirely» pattern — the app reads from a vault at boot. Standard for enterprise deployments with rotation requirements.</p>
+              <p><strong>Why rejected:</strong> a vault adds a separate failure mode (vault down ⇒ app cannot boot), a separate auth model (vault credentials are themselves a secret), and a separate local-dev story (vault stub or shared dev secrets). For a solo project with no secret-rotation requirement yet, the env-file + git-ignored <code>.env</code> pattern is strictly cheaper. The day we have multi-tenant secret rotation is the day to revisit.</p>
+            </div>
+          </article>
+          <article class="docs-card" data-tone="warn">
+            <div class="docs-card__head"><h3 class="docs-card__title">More profiles: <code>dev</code>, <code>test</code>, <code>staging</code>, <code>prod</code>, <code>preview</code>, …</h3><span class="docs-pill docs-pill--danger">rejected</span></div>
+            <div class="docs-card__body">
+              <p><strong>Why considered:</strong> match a Heroku-style review-app workflow with one profile per deployment kind. More granular guarantees per environment.</p>
+              <p><strong>Why rejected:</strong> three profiles cover «running locally», «running with prod-like constraints» (qa/test), and «running in production». Adding more profiles invites «which one applies?» ambiguity (is the load-test environment <code>qa</code> or its own <code>load</code>?) and grows the validation matrix N×. Three is the smallest set that lets us write meaningful per-profile rules without combinatorial blowup.</p>
+            </div>
+          </article>
+        </div>
+        <p><strong>Trade we accept by choosing three explicit profiles + fail-fast validation.</strong> Every new validation rule is paid once at authoring time and stays paid. We accept it because each rejected alternative invites a failure mode this ADR exists to prevent: no-profiles ships unsafe combinations silently, external vaults add an outage axis we have not justified, and more profiles inflate the matrix faster than the value grows. Three profiles + a committed template is the smallest mechanism that is both <em>auditable</em> and <em>operable</em>.</p>
+      </section>
+
+      <section aria-labelledby="consequences-h">
+        <h2 id="consequences-h">Consequences</h2>
+        <div class="docs-card-grid docs-card-grid--stack">
+          <article class="docs-card" data-tone="success">
+            <div class="docs-card__head"><h3 class="docs-card__title">Positive</h3><span class="docs-pill docs-pill--success">wins</span></div>
+            <div class="docs-card__body">
+              <ul>
+                <li>Clear branch logic for environment behavior with safer defaults.</li>
+                <li>Reduced risk of accidental insecure production configuration.</li>
+                <li>Better developer onboarding for environment-specific setup.</li>
+              </ul>
+            </div>
+          </article>
+          <article class="docs-card" data-tone="warn">
+            <div class="docs-card__head"><h3 class="docs-card__title">Trade-offs</h3><span class="docs-pill docs-pill--warn">costs</span></div>
+            <div class="docs-card__body">
+              <p>Two named tradeoffs accepted on purpose. Shape from
+                <a href="../../handbook/sa/tradeoff-disclosure.html">Tradeoff disclosure</a>.</p>
+                <ul class="rail-list" data-tone="rose">
+                  <li><strong>Fail-fast on unsafe config (startup refuses to boot).</strong> We gain a process that cannot serve traffic with mock auth in <code>qa</code> / <code>prod</code> — the validation rule is the gate, not a runtime check that can be silently disabled. We lose the option of «boot in degraded mode and warn» (some teams prefer this for partial-outage scenarios). We accept it because partial-boot with mock auth in production is the exact failure mode this ADR exists to prevent; the «soft warn» pattern always converges on «the warning was ignored, now we have the incident».</li>
+                  <li><strong>Profile name baked into the runtime (<code>APP_ENV</code>).</strong> We gain a single switch that the validation rules and the <code>/live</code> endpoint can read, so the effective profile is visible end-to-end. We lose the «one binary, infinitely composable env vars» purity that some twelve-factor purists prefer. We accept it because the profile is the load-bearing branch in our validation rules; making it implicit (derive from other vars) is the recipe for «which profile am I actually in?» confusion.</li>
+                </ul>
+              </div>
+            </article>
+          </div>
+
+          <h3>Revisit — would we do this again?</h3>
+          <p><strong>Yes, with one piece we did not commit to early enough.</strong> The three-profile + fail-fast model has caught two unsafe pre-deploys (a leftover <code>LOG_LEVEL=DEBUG</code> in a <code>prod</code> dry-run, a default mock key in a <code>qa</code> smoke). One addition we would commit to on day one if starting today:</p>
+          <ul class="rail-list" data-tone="info">
+            <li><strong>Validate the env file before <code>docker build</code>, not at runtime.</strong> Today the validation runs at app startup; a misconfigured deployment produces a crash-loop pod that the operator has to inspect to learn what went wrong. A CI step that exercises <code>services/api/app/core/config.py</code>'s validator with the production env file (with secrets stubbed) would fail the deploy at the pipeline step, not at the pod. The validator already exists; wiring it into pre-deploy CI is a 30-min job that closes the «caught at boot, not at build» gap.</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="compatibility-h">
+          <h2 id="compatibility-h">Compatibility and migration</h2>
+          <ul>
+            <li><strong>Backward-compatibility impact:</strong> none — pure governance / convention change with no wire-level effect for existing consumers.</li>
+            <li><strong>Migration plan:</strong> apply the rules to new work; bring existing artefacts into compliance during normal touch-ups.</li>
+            <li><strong>Rollback strategy:</strong> revert the merge PR; no data or schema changes to undo.</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="implementation-h">
+          <h2 id="implementation-h">Implementation in this repository</h2>
+          <div class="docs-table-wrap" role="region" aria-label="Config governance implementation surfaces">
+            <table class="docs-table docs-table--zebra">
+              <thead>
+                <tr>
+                  <th scope="col">Category</th>
+                  <th scope="col">Path / target</th>
+                  <th scope="col">Note</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Profile-aware loader + validation</td>
+                  <td><code>services/api/app/core/config.py</code></td>
+                  <td>—</td>
+                </tr>
+                <tr>
+                  <td>Env templates</td>
+                  <td><code>env/example</code>, <code>env/dev</code>, <code>env/qa</code>, <code>env/prod</code></td>
+                  <td>small per-profile overrides on top of <code>example</code></td>
+                </tr>
+                <tr>
+                  <td>Observability compose</td>
+                  <td><code>services/monitoring/docker-compose.observability.yml</code></td>
+                  <td>env-driven ports, scrape target, Grafana creds</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section aria-labelledby="validation-h">
+          <h2 id="validation-h">Validation Rules</h2>
+          <div class="docs-table-wrap" role="region" aria-label="Profile validation rules">
+            <table class="docs-table docs-table--zebra">
+              <thead>
+                <tr>
+                  <th scope="col">Profile</th>
+                  <th scope="col">Rule</th>
+                  <th scope="col">Failure</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><code>qa</code> / <code>prod</code></td><td><code>API_AUTH_STRATEGY=disabled</code></td><td>forbidden</td></tr>
+                <tr><td><code>qa</code> / <code>prod</code></td><td>default <code>API_MOCK_API_KEY</code></td><td>forbidden</td></tr>
+                <tr><td><code>qa</code> / <code>prod</code></td><td><code>METRICS_ENABLED</code></td><td>must be <code>true</code></td></tr>
+                <tr><td><code>prod</code></td><td>localhost origins in CORS</td><td>forbidden</td></tr>
+                <tr><td><code>prod</code></td><td><code>LOG_LEVEL=DEBUG</code></td><td>forbidden</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <footer class="docs-history" aria-label="History">
+          <h2 class="docs-history__title">History</h2>
+          <ul class="docs-history__list">
+            <li class="docs-history__row">
+              <span class="docs-history__date">2026-06-01</span>
+              <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm">@ivan</a>
+              <span class="docs-history__note">Substance audit-pass. Result before: 1/5. Patch: status pill → <code>.lifecycle-popover</code>; <code>§ Validation Rules</code> 5-bullet list → 5-row <code>.docs-table</code> (Profile · Rule · Failure); <code>§ Implementation</code> → 3-row table; <code>§ Consequences &gt; Trade-offs</code> restructured into two canonical entries (fail-fast on unsafe · profile in <code>APP_ENV</code>); new <code>§ Alternatives considered</code> with three real alternatives (no profiles · external vault · more profiles); closing accept-clause; new <code>§ Would we do this again?</code> adding pre-deploy validator wiring. Inline <code>style</code> stripped.</span>
+            </li>
+            <li class="docs-history__row">
+              <span class="docs-history__date">2026-05-17</span>
+              <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm">@ivan</a>
+              <span class="docs-history__note">Migrated to UI Kit v3 (entry.css, docs-shell, page-head, consequences as paired tone cards).</span>
+            </li>
+          </ul>
+        </footer>
+
+      </article>
+    </main>
+
+    <aside class="docs-toc" aria-label="On this page"></aside>
+    <button data-component="toc-fab" type="button" aria-label="On this page" aria-expanded="false"></button>
+
+    <script type="module" src="../../../../frontend/portal/assets_v2/runtime/internal/entry.js"></script>
+
+  </body></html>

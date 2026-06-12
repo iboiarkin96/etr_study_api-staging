@@ -1,0 +1,235 @@
+<!doctype html>
+<html data-portal="internal" data-theme="light" lang="en"><head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <title>RFC Index · Study App Internal</title>
+  <script>(function(){try{var v=localStorage.getItem("docs-theme-preference");if(v==="dark"||v==="light")document.documentElement.setAttribute("data-theme",v);}catch(e){}})();</script>
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..900&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <link href="../../../../frontend/portal/assets_v2/favicon.svg" rel="icon" type="image/svg+xml">
+  <link href="../../../../frontend/portal/assets_v2/runtime/internal/entry.css" rel="stylesheet">
+  <style>
+    /* RFC index — toolbar + view-switcher overlays. Composes UI Kit v3
+    docs-view-switcher and multi-filter-chips; only layout glue and
+    the cards-vs-table toggle live here. */
+    .rfc-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    margin: 0 0 var(--space-4);
+    }
+    .rfc-toolbar__group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    }
+    .rfc-toolbar__label {
+    font-family: var(--font-mono);
+    font-size: var(--fs-100);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    }
+    #rfc-views[data-view="by-group"] .rfc-table-view { display: none; }
+    #rfc-views[data-view="table"]    .rfc-by-group   { display: none; }
+
+    .rfc-empty {
+    padding: var(--space-5);
+    text-align: center;
+    color: var(--muted);
+    border: 1px dashed var(--line);
+    border-radius: var(--radius-lg);
+    display: none;
+    }
+    #rfc-views[data-empty="true"] .rfc-empty { display: block; }
+  </style>
+</head>
+<body class="docs-shell" data-lifecycle="published" data-maintainer-ids="16fc8b78537109162984a2fdbef6e142" data-page-type="landing-section" data-role="architect" data-service="none" data-updated="2026-06-06">
+  <header class="topbar" role="banner">
+    <a class="topbar__brand" href="../../index.html"><span aria-hidden="true">🛠</span><span>Study App · Internal</span></a>
+    <nav aria-label="Breadcrumb" class="topbar__breadcrumbs">
+      <ol class="docs-breadcrumbs__list">
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="../../index.html">Internal</a></li>
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="../index.html">Governance</a></li>
+        <li aria-current="page" class="docs-breadcrumbs__item">RFC</li>
+      </ol>
+    </nav>
+    <div class="topbar__spacer"></div>
+    <div class="topbar__actions">
+      <button aria-label="Toggle theme" class="docs-theme-toggle" type="button"></button>
+    </div>
+  </header>
+  <aside aria-label="Section navigation" data-component="sidebar" data-nav-src="../../../../frontend/portal/assets_v2/ui-kit/mocks/nav-tree-internal.json"></aside>
+  <main class="container">
+    <!-- ── Hero ────────────────────────────────────────────────────────── -->
+    <section class="home-hero home-hero--section">
+      <div class="home-hero__layout">
+        <div class="home-hero__copy">
+          <p class="home-hero__eyebrow">Internal · Governance · RFC</p>
+          <h1 class="home-hero__title">
+            Requests for <span class="home-hero__title-accent">Comments</span>
+          </h1>
+          <div id="docs-top-nav"></div>
+          <p class="home-hero__tagline">
+            RFCs spell out <strong>how</strong> we build and run things — implementation detail, design
+            rationale, and operational steps. <a href="../adr/index.html">ADRs</a> record <strong>what</strong>
+            we decided and <strong>why</strong>; an RFC usually follows an ADR and provides the specification
+            the ADR intentionally omits. New RFCs start from the
+            <a href="../../handbook/sa/templates/rfc.html">RFC template</a> and follow the lifecycle in
+            <a href="../adr/0018-adr-lifecycle-ratification-and-badges.html">ADR 0018</a>.
+          </p>
+          <div class="home-hero__stats">
+            <span class="docs-pill docs-pill--success">2 accepted</span>
+            <span class="docs-pill docs-pill--warn">2 proposed</span>
+          </div>
+        </div>
+        <dl aria-label="RFC snapshot" class="home-hero__tickers">
+          <div class="home-hero__ticker" data-tone="accent"><dt>Total</dt><dd>4</dd></div>
+          <div class="home-hero__ticker" data-tone="done"><dt>Accepted</dt><dd>2</dd></div>
+          <div class="home-hero__ticker" data-tone="progress"><dt>Proposed</dt><dd>2</dd></div>
+          <div class="home-hero__ticker" data-tone="todo"><dt>Programs</dt><dd>4</dd></div>
+        </dl>
+      </div>
+    </section>
+    <!-- ── Toolbar: program filter + view switcher ────────────────────── -->
+    <div class="rfc-toolbar">
+      <div class="rfc-toolbar__group">
+        <span class="rfc-toolbar__label">Program</span>
+        <div aria-label="Program" data-component="multi-filter-chips" data-default="all" data-state-key="program">
+          <button aria-pressed="true" class="docs-chip docs-chip--filter" data-value="all" type="button">All</button>
+          <button aria-pressed="false" class="docs-chip docs-chip--filter" data-value="multi-service-ia" type="button">Multi-service IA</button>
+          <button aria-pressed="false" class="docs-chip docs-chip--filter" data-value="authoring-model" type="button">Authoring model</button>
+          <button aria-pressed="false" class="docs-chip docs-chip--filter" data-value="portal-ia" type="button">Portal IA</button>
+          <button aria-pressed="false" class="docs-chip docs-chip--filter" data-value="docs-search" type="button">Docs Search</button>
+        </div>
+      </div>
+      <div class="rfc-toolbar__group">
+        <span class="rfc-toolbar__label">View</span>
+        <div aria-label="View" class="docs-view-switcher" data-component="view-switcher" data-default="by-group" data-storage-key="rfc-view" data-target="#rfc-views">
+          <button class="docs-view-switcher__btn" data-view="by-group" type="button">
+            <svg aria-hidden="true" fill="none" viewBox="0 0 13 13">
+              <rect height="5.5" rx="1" stroke="currentColor" stroke-width="1.2" width="5.5" x="0.5" y="0.5"></rect>
+              <rect height="5.5" rx="1" stroke="currentColor" stroke-width="1.2" width="5.5" x="7" y="0.5"></rect>
+              <rect height="5.5" rx="1" stroke="currentColor" stroke-width="1.2" width="5.5" x="0.5" y="7"></rect>
+              <rect height="5.5" rx="1" stroke="currentColor" stroke-width="1.2" width="5.5" x="7" y="7"></rect>
+            </svg>
+            By group
+          </button>
+          <button class="docs-view-switcher__btn" data-view="table" type="button">
+            <svg aria-hidden="true" fill="none" viewBox="0 0 13 13">
+              <rect height="3" rx="1" stroke="currentColor" stroke-width="1.2" width="12" x="0.5" y="0.5"></rect>
+              <rect height="3" rx="1" stroke="currentColor" stroke-width="1.2" width="12" x="0.5" y="5"></rect>
+              <rect height="3" rx="1" stroke="currentColor" stroke-width="1.2" width="12" x="0.5" y="9.5"></rect>
+            </svg>
+            Table
+          </button>
+        </div>
+      </div>
+    </div>
+    <div data-view="by-group" id="rfc-views">
+      <div class="rfc-by-group">
+        <!-- ── Programs ────────────────────────────────────────────────────── -->
+        <section aria-labelledby="msia-h" data-group="multi-service-ia" id="multi-service-ia">
+          <h2 id="msia-h">Multi-service IA program</h2>
+          <p>The growable internal portal: Backstage-subset entity catalog (System / Component / Library / API / Resource), per-type spine matrix, the four missing systems-analyst genres (Requirements / Domain model / Process documentation / NFRs) inside every Component, a Foundations layer for cross-cutting content, and a Practices layer for cross-service ways of working (testing pyramid, docs-as-code, observability discipline, …). Sized to scale from 4 to 50+ entities without structural rework. RFC 0006 extends this with audience-portal (L1) and domain-hub (L2) layers above the entity catalog so the portal also scales from 250 to 1000+ pages. Refines <a href="../adr/0026-internal-service-documentation-as-source-of-truth.html">ADR 0026</a> and operates inside the internal layer landed in RFC 0004.</p>
+          <ol class="spine-grid"><li><a class="spine-tile" data-tone="info" href="0006-portal-ia-scalability.html"><div class="spine-tile__head"><span class="spine-tile__index">RFC 0006 · Proposed</span></div><h3 class="spine-tile__title">Portal IA scalability — three-layer model</h3><p class="spine-tile__body">Three orthogonal layers — L1 audience portals (sa · dev · sre · qa · pm · manager · security · architect), L2 domain hubs (api · data · observability · security · governance · delivery · platform), L3 entity catalog (per RFC 0005). One page, one URL, three entry points. Three-phase migration with zero-broken-link redirect contract.</p><div class="spine-tile__foot"><span class="spine-tile__cta">Open</span><span aria-hidden="true" class="spine-tile__arrow">→</span></div></a></li></ol>
+        </section>
+        <section aria-labelledby="authoring-h" data-group="authoring-model" id="authoring-model">
+          <h2 id="authoring-h">Documentation authoring model</h2>
+          <p>How we document API endpoints, screens, ADRs, runbooks, how-tos: the closed taxonomy of document types, required sections per template, and the lint / audit / DoD gates that turn templates into a contract.</p>
+          <ol class="spine-grid"><li><a class="spine-tile" data-tone="info" href="0003-documentation-authoring-model.html"><div class="spine-tile__head"><span class="spine-tile__index">RFC 0003 · Proposed</span></div><h3 class="spine-tile__title">Documentation authoring model</h3><p class="spine-tile__body">Taxonomy, API + screen spec templates, industry references (Stripe / Atlassian / Carbon / Material / Storybook / GOV.UK / IETF / C4), section catalogues in Appendix A &amp; B.</p><div class="spine-tile__foot"><span class="spine-tile__cta">Open</span><span aria-hidden="true" class="spine-tile__arrow">→</span></div></a></li></ol>
+        </section>
+        <section aria-labelledby="ia-h" data-group="portal-ia" id="portal-ia">
+          <h2 id="ia-h">Documentation portal information architecture</h2>
+          <p>How <code>services/portal/</code> splits into a public layer (Diátaxis) for integrators and an internal layer (Backstage IDP + SRE Book) for the team — audience as IA, not auth. Amends <a href="../adr/0028-monorepo-with-service-boundaries.html">ADR 0028</a>.</p>
+          <ol class="spine-grid"><li><a class="spine-tile" data-tone="info" href="0004-public-vs-internal-documentation-portal-ia.html"><div class="spine-tile__head"><span class="spine-tile__index">RFC 0004 · Accepted</span></div><h3 class="spine-tile__title">Public vs internal portal IA</h3><p class="spine-tile__body">Framework choices, comparative analysis, <code>data-portal</code>/<code>data-page-type</code> conventions, six phases shipped 2026-05-08 → 2026-06-06, ADR 0028 amendment in force.</p><div class="spine-tile__foot"><span class="spine-tile__cta">Open</span><span aria-hidden="true" class="spine-tile__arrow">→</span></div></a></li></ol>
+        </section>
+        <section aria-labelledby="search-h" data-group="docs-search" id="docs-search">
+          <h2 id="search-h">Docs Search program</h2>
+          <p>Client-side full-text search across all documentation pages: index build, query ranking, telemetry, SLO targets. Architecture decision in <a href="../adr/0033-portal-search-engine-pagefind.html">ADR 0033</a> (Pagefind, supersedes <a href="../adr/0027-client-side-docs-search-index-and-ranking.html">ADR 0027</a>).</p>
+          <ol class="spine-grid"><li><a class="spine-tile" data-tone="info" href="0002-docs-search-kpi-policy-and-slo.html"><div class="spine-tile__head"><span class="spine-tile__index">RFC 0002 · Accepted</span></div><h3 class="spine-tile__title">Docs search KPI &amp; SLO</h3><p class="spine-tile__body">Zero-result rate, query CTR, time-to-first-success targets; warning/breach limits; on-call response.</p><div class="spine-tile__foot"><span class="spine-tile__cta">Open</span><span aria-hidden="true" class="spine-tile__arrow">→</span></div></a></li></ol>
+        </section>
+      </div><!-- /.rfc-by-group -->
+      <!-- ── Table view ─────────────────────────────────────────────────── -->
+      <div class="rfc-table-view">
+        <div class="docs-table-wrap">
+          <table class="docs-table docs-table--zebra docs-table--sticky-head">
+            <thead><tr><th>RFC</th><th>Summary</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr data-group="docs-search"><td><a href="0002-docs-search-kpi-policy-and-slo.html">RFC 0002</a></td><td>Docs search KPIs: zero-result rate, query CTR, time-to-first-success, on-call response.</td><td><span class="docs-pill docs-pill--success">Accepted</span></td></tr>
+              <tr data-group="authoring-model"><td><a href="0003-documentation-authoring-model.html">RFC 0003</a></td><td>Documentation authoring model: taxonomy, API + screen spec templates, industry references, lint / audit / DoD gates.</td><td><span class="docs-pill docs-pill--warn">Proposed</span></td></tr>
+              <tr data-group="portal-ia"><td><a href="0004-public-vs-internal-documentation-portal-ia.html">RFC 0004</a></td><td>Public vs internal portal IA: Diátaxis (public), Backstage IDP (internal), SRE Book (ops), GitLab single-portal pattern; amends ADR 0028.</td><td><span class="docs-pill docs-pill--warn">Proposed</span></td></tr>
+              <tr data-group="multi-service-ia"><td><a href="0006-portal-ia-scalability.html">RFC 0006</a></td><td>Portal IA scalability — L1 audience portals + L2 domain hubs above the RFC 0005 entity catalog, faceted frontmatter taxonomy, federation trigger at ~150 pages, search-first navigation, three-phase plan with redirect contract.</td><td><span class="docs-pill docs-pill--warn">Proposed</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div><!-- /.rfc-table-view -->
+      <div class="rfc-empty">No RFCs match this filter.</div>
+    </div><!-- /#rfc-views -->
+    <footer aria-label="History" class="docs-history">
+      <h2 class="docs-history__title">History</h2>
+      <ul class="docs-history__list">
+        <li class="docs-history__row">
+          <span class="docs-history__date">2026-06-01</span>
+          <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm">@ivan</a>
+          <span class="docs-history__note">Added RFC 0006 (Portal IA scalability — three-layer model) under the Multi-service IA program; tickers and pills now read 6 total / 4 proposed.</span>
+        </li>
+        <li class="docs-history__row">
+          <span class="docs-history__date">2026-05-18</span>
+          <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm">@ivan</a>
+          <span class="docs-history__note">Added Multi-service IA program section and RFC 0005 to the index; tickers and pills now read 5 total / 3 proposed / 4 programs.</span>
+        </li>
+        <li class="docs-history__row">
+          <span class="docs-history__date">2026-05-17</span>
+          <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm">@ivan</a>
+          <span class="docs-history__note">Migrated RFC index to UI Kit v3: section hero, ticker snapshot, jump-chip nav, per-program card grids, sticky-head full index, cross-link to <code>/portal/ui-kit</code>.</span>
+        </li>
+        <li class="docs-history__row">
+          <span class="docs-history__date">2026-05-08</span>
+          <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm">@ivan</a>
+          <span class="docs-history__note">Added Portal-IA program section and RFC 0004 to the index.</span>
+        </li>
+        <li class="docs-history__row">
+          <span class="docs-history__date">2026-04-30</span>
+          <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm">@ivan</a>
+          <span class="docs-history__note">Added Authoring-model program section and RFC 0003 to the index.</span>
+        </li>
+      </ul>
+    </footer>
+  </main>
+  <aside aria-label="On this page" class="docs-toc"></aside>
+  <button aria-expanded="false" aria-label="On this page" data-component="toc-fab" type="button"></button>
+  <script>
+    /* Program filter glue — listens for `multifilterchange` from
+    multi-filter-chips and toggles `hidden` on every [data-group]
+    element (sections in By-group view + rows in Table view). Runs
+    once on load so deep-links like `#program=docs-search` are honoured. */
+    (function () {
+    function apply(value) {
+    var v = value || "all";
+    var els = document.querySelectorAll("#rfc-views [data-group]");
+    var visible = 0;
+    els.forEach(function (el) {
+    var match = v === "all" || el.getAttribute("data-group") === v;
+    el.hidden = !match;
+    if (match) visible++;
+    });
+    var views = document.getElementById("rfc-views");
+    if (views) views.setAttribute("data-empty", visible === 0 ? "true" : "false");
+    }
+    window.addEventListener("multifilterchange", function (e) {
+    if (e.detail && e.detail.key === "program") apply(e.detail.value);
+    });
+    try {
+    var params = new URLSearchParams((location.hash || "").replace(/^#/, ""));
+    apply(params.get("program") || "all");
+    } catch (_) { apply("all"); }
+    })();
+  </script>
+  <script src="../../../../frontend/portal/assets_v2/runtime/internal/entry.js" type="module"></script>
+
+</body></html>

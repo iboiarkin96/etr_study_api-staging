@@ -1,0 +1,55 @@
+@startuml
+title ETR Study API — C4 Level 2 (containers)
+
+top to bottom direction
+
+actor "Integrator" as Client
+
+package "API process\n(single deployable)" as Proc {
+  [HTTP · FastAPI] as Http
+  [Domain services] as App
+  [Repositories] as Persist
+  Http -[hidden]down- App
+  App -[hidden]down- Persist
+}
+
+database "Database" as Db
+queue "Redis\n(cache, rate limit, idempotency)" as Redis
+rectangle "Alembic" as Mig
+
+package "Observability\n(optional)" as Obs {
+  [Grafana] as Graf
+  [Prometheus] as Prom
+  [Blackbox] as Bbx
+}
+
+package "Log pipeline\n(optional)" as LogStack {
+  [Elasticsearch] as ES
+  [Kibana] as Kib
+  [Filebeat] as FB
+}
+
+artifact "NDJSON logs" as LogFile
+
+Client --> Http : HTTPS / JSON
+Http --> App
+App --> Persist
+Persist --> Db : SQL
+Persist ..> Redis : cache / counters / TTL keys
+Mig ..> Db : migrations
+
+App ..> LogFile
+LogFile ..> FB
+FB --> ES
+Kib --> ES
+
+Graf --> Prom
+Prom ..> Http : :8000/metrics
+Bbx ..> Http : :8000/ready
+
+note bottom of App
+  Writes update snapshots and append
+  review_log / conspectus_events in one transaction.
+end note
+
+@enduml

@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en" data-portal="internal" data-theme="light"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Error matrix by status · API · Study App Internal</title>
+  <script>(function(){try{var v=localStorage.getItem("docs-theme-preference");if(v==="dark"||v==="light")document.documentElement.setAttribute("data-theme",v);}catch(e){}})();</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..900&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="../../../../../frontend/portal/assets_v2/favicon.svg">
+  <link rel="stylesheet" href="../../../../../frontend/portal/assets_v2/runtime/internal/entry.css">
+</head>
+<body data-page-type="reference" class="docs-shell" data-maintainer-ids="16fc8b78537109162984a2fdbef6e142">
+
+  <header class="topbar" role="banner">
+    <a class="topbar__brand" href="../../../index.html"><span aria-hidden="true">📚</span><span>Study App · Internal</span></a>
+    <nav class="topbar__breadcrumbs" aria-label="Breadcrumb">
+      <ol class="docs-breadcrumbs__list">
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="../../../index.html">Internal</a></li>
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="../../index.html">Services</a></li>
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="../index.html">api</a></li>
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="index.html">Reference</a></li>
+        <li class="docs-breadcrumbs__item" aria-current="page">Error matrix by status</li>
+      </ol>
+    </nav>
+    <div class="topbar__spacer"></div>
+    <div class="topbar__actions">
+      <button class="docs-theme-toggle" type="button" aria-label="Toggle theme"></button>
+    </div>
+  </header>
+
+  <aside data-component="sidebar" data-nav-src="../../../../../frontend/portal/assets_v2/ui-kit/mocks/nav-tree-internal.json" aria-label="Section navigation"></aside>
+
+  <main class="container">
+    <article class="docs-prose">
+      <header class="page-head">
+        <div class="docs-chip-row">
+          <span class="docs-pill docs-pill--info">Reference</span>
+          <span class="docs-pill docs-pill--warn">API</span>
+          <span class="docs-pill docs-pill--neutral">Conventions</span>
+        </div>
+        <h1>Error matrix by status</h1>
+        <div id="docs-top-nav"></div>
+        <p class="lede">How to mix shared <code>COMMON_*</code> errors with entity-prefixed codes (for example <code>USER_*</code>), and how to review routers by HTTP status.</p>
+      </header>
+
+      <h2 id="rule">Rule of thumb</h2>
+      <ul>
+        <li>Use <code>COMMON_*</code> when the same error applies everywhere.</li>
+        <li>Use entity prefixes (for example, <code>USER_*</code> for user) for domain-specific cases.</li>
+        <li>Never change the meaning of a published <code>code</code> + <code>key</code> pair.</li>
+        <li>Mirror declared responses in OpenAPI examples and tests.</li>
+      </ul>
+
+      <h2 id="where">Where to define reusable responses</h2>
+      <ul>
+        <li><code>services/api/app/errors/common.py</code> and <code>services/api/app/errors/user.py</code> — one place for stable <code>code</code>, <code>key</code>, and default <code>message</code> values, plus the validation maps. Import from here; do not copy the strings.</li>
+        <li><code>services/api/app/openapi/responses.py</code> — shared response blocks for routers.</li>
+        <li><code>services/api/app/openapi/examples/errors.py</code> — OpenAPI example payloads built from the catalog.</li>
+        <li><code>services/api/app/api/v1/*.py</code> — endpoint-level assembly of common and entity responses.</li>
+      </ul>
+
+      <h2 id="common-pool">Service-wide common pool (recommended baseline)</h2>
+      <div class="docs-table-wrap" role="region" aria-label="Common pool">
+        <table class="docs-table docs-table--sticky-head docs-table--zebra">
+          <thead>
+            <tr><th>HTTP status</th><th>Code(s)</th><th>Key(s)</th><th>Reuse scope</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>401</code></td><td><code>COMMON_401</code></td><td><code>SECURITY_AUTH_REQUIRED</code></td><td>All protected endpoints.</td></tr>
+            <tr><td><code>413</code></td><td><code>COMMON_413</code></td><td><code>SECURITY_REQUEST_BODY_TOO_LARGE</code></td><td>Endpoints that can receive oversized body.</td></tr>
+            <tr><td><code>429</code></td><td><code>COMMON_429</code></td><td><code>SECURITY_RATE_LIMIT_EXCEEDED</code></td><td>All endpoints behind rate limiting.</td></tr>
+            <tr><td><code>409</code></td><td><code>COMMON_409</code></td><td><code>IDEMPOTENCY_KEY_REUSED_WITH_DIFFERENT_PAYLOAD</code></td><td>Write endpoints with idempotency semantics.</td></tr>
+            <tr><td><code>400</code></td><td><code>COMMON_400</code></td><td><code>IDEMPOTENCY_KEY_REQUIRED</code></td><td>Write endpoints where idempotency key is required.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="envelopes">Wire-format examples per status class</h2>
+      <p>What the integrator actually sees on the wire. Envelope shape is defined once in <a href="_shared/error-envelope.html">_shared/error-envelope.html</a>; each example below conforms to it. Fields used: <code>code</code> (numeric machine ID), <code>key</code> (stable string), <code>message</code> (developer-facing prose), <code>request_id</code> (correlation), optional <code>details[]</code> for field-level errors.</p>
+
+      <h3 id="env-400">400 — bad request (idempotency precondition)</h3>
+      <pre class="docs-code"><code class="language-http">HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+  "error": {
+    "code": "COMMON_400",
+    "key": "IDEMPOTENCY_KEY_REQUIRED",
+    "message": "Missing required `Idempotency-Key` header for write operation."
+  },
+  "request_id": "req_01HZ3PXQ2K7B9TJYC6V0M4F8WN"
+      }</code></pre>
+
+      <h3 id="env-401">401 — unauthenticated</h3>
+      <pre class="docs-code"><code class="language-http">HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+
+{
+  "error": {
+    "code": "COMMON_401",
+    "key": "SECURITY_AUTH_REQUIRED",
+    "message": "Missing or invalid API key in header `X-API-Key`."
+  },
+  "request_id": "req_01HZ3PXQ2K7B9TJYC6V0M4F8WP"
+      }</code></pre>
+
+      <h3 id="env-404">404 — entity not found / cross-tenant collapsed</h3>
+      <p>Cross-tenant access deliberately returns the same envelope as a true miss — never 403 — per <a href="_shared/auth.html#why-404">_shared/auth.html</a>.</p>
+      <pre class="docs-code"><code class="language-http">HTTP/1.1 404 Not Found
+Content-Type: application/json
+
+{
+  "error": {
+    "code": "CONS_404",
+    "key": "CONSPECTUS_NOT_FOUND",
+    "message": "Conspectus not found."
+  },
+  "request_id": "req_01HZ3PXQ2K7B9TJYC6V0M4F8WQ"
+      }</code></pre>
+
+      <h3 id="env-409">409 — idempotency conflict</h3>
+      <pre class="docs-code"><code class="language-http">HTTP/1.1 409 Conflict
+Content-Type: application/json
+
+{
+  "error": {
+    "code": "COMMON_409",
+    "key": "IDEMPOTENCY_KEY_REUSED_WITH_DIFFERENT_PAYLOAD",
+    "message": "Idempotency key was already used with another payload."
+  },
+  "request_id": "req_01HZ3PXQ2K7B9TJYC6V0M4F8WR"
+      }</code></pre>
+
+      <h3 id="env-422">422 — field-level validation (details array)</h3>
+      <p>The envelope's top-level <code>code/key</code> is <code>COMMON_000 / COMMON_VALIDATION_ERROR</code>; per-field issues are enumerated in <code>details[]</code> using entity-prefixed keys so clients can render field-targeted error messages.</p>
+      <pre class="docs-code"><code class="language-http">HTTP/1.1 422 Unprocessable Entity
+Content-Type: application/json
+
+{
+  "error": {
+    "code": "COMMON_000",
+    "key": "COMMON_VALIDATION_ERROR",
+    "message": "Request validation failed.",
+    "details": [
+      {
+        "field": "timezone",
+        "code": "USER_007",
+        "key": "USER_CREATE_TIMEZONE_INVALID",
+        "message": "Timezone must be a valid IANA zone."
+      },
+      {
+        "field": "full_name",
+        "code": "USER_004",
+        "key": "USER_CREATE_FULL_NAME_TOO_LONG",
+        "message": "full_name must be ≤ 256 characters."
+      }
+    ]
+  },
+  "request_id": "req_01HZ3PXQ2K7B9TJYC6V0M4F8WS"
+      }</code></pre>
+
+      <h3 id="env-500">500 — unexpected server error</h3>
+      <p>The <code>code/key</code> pair is intentionally omitted on 5xx — clients should not key UI off it. Only <code>request_id</code> is stable, for the integrator to quote when filing a ticket.</p>
+      <pre class="docs-code"><code class="language-http">HTTP/1.1 500 Internal Server Error
+Content-Type: application/json
+
+{
+  "error": {
+    "message": "Internal server error."
+  },
+  "request_id": "req_01HZ3PXQ2K7B9TJYC6V0M4F8WT"
+      }</code></pre>
+
+      <h2 id="review">Router review checklist (status-first)</h2>
+      <ol>
+        <li>List all response statuses declared in router <code>responses={...}</code>.</li>
+        <li>Mark each status as <strong>COMMON</strong> or <strong>ENTITY</strong>.</li>
+        <li>Ensure COMMON statuses come from <code>services/api/app/openapi/responses.py</code>.</li>
+        <li>Ensure ENTITY statuses use entity-prefixed code space and mapped examples.</li>
+        <li>Validate with tests and <code>make verify</code>.</li>
+      </ol>
+    </article>
+
+    <footer class="docs-history" aria-label="History">
+      <h2 class="docs-history__title">History</h2>
+      <ul class="docs-history__list">
+        <li class="docs-history__row">
+          <span class="docs-history__date">2026-05-16</span>
+          <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm">@ivan</a>
+          <span class="docs-history__note">Migrated to UI Kit v3: <code>docs-prose</code> + <code>page-head</code>; common-pool table on <code>docs-table--sticky-head --zebra</code>.</span>
+        </li>
+        <li class="docs-history__row">
+          <span class="docs-history__date">2026-05-03</span>
+          <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm">@ivan</a>
+          <span class="docs-history__note">Moved <code>id="history"</code> from the Rule-of-thumb card to the actual history section. Normalized hyphen connectors to em dashes.</span>
+        </li>
+      </ul>
+    </footer>
+  </main>
+
+  <aside class="docs-toc" aria-label="On this page">
+    <p class="docs-toc__title">On this page</p>
+    <ol class="docs-toc__list">
+      <li class="docs-toc__item"><a class="docs-toc__link" href="#rule">Rule</a></li>
+      <li class="docs-toc__item"><a class="docs-toc__link" href="#where">Where to define</a></li>
+      <li class="docs-toc__item"><a class="docs-toc__link" href="#common-pool">Common pool</a></li>
+      <li class="docs-toc__item"><a class="docs-toc__link" href="#envelopes">Wire-format examples</a></li>
+      <li class="docs-toc__item"><a class="docs-toc__link" href="#review">Router review</a></li>
+    </ol>
+  </aside>
+  <button data-component="toc-fab" type="button" aria-label="On this page" aria-expanded="false"></button>
+
+  <script type="module" src="../../../../../frontend/portal/assets_v2/runtime/internal/entry.js"></script>
+
+</body></html>

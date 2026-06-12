@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en" data-portal="internal" data-theme="light"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ADR 0017 · Branch Naming and Repository Workflow · Study App Internal</title>
+  <script>(function(){try{var v=localStorage.getItem("docs-theme-preference");if(v==="dark"||v==="light")document.documentElement.setAttribute("data-theme",v);}catch(e){}})();</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..900&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="../../../../frontend/portal/assets_v2/favicon.svg">
+  <link rel="stylesheet" href="../../../../frontend/portal/assets_v2/runtime/internal/entry.css">
+</head>
+<body data-page-type="reference" class="docs-shell" data-maintainer-ids="16fc8b78537109162984a2fdbef6e142" data-service="none" data-lifecycle="published" data-updated="2026-06-06" data-role="architect">
+
+  <header class="topbar" role="banner">
+    <a class="topbar__brand" href="../../index.html"><span aria-hidden="true">🛠</span><span>Study App · Internal</span></a>
+    <nav class="topbar__breadcrumbs" aria-label="Breadcrumb">
+      <ol class="docs-breadcrumbs__list">
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="../../index.html">Internal</a></li>
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="../index.html">Governance</a></li>
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="index.html">ADR</a></li>
+        <li class="docs-breadcrumbs__item" aria-current="page">0017</li>
+      </ol>
+    </nav>
+    <div class="topbar__spacer"></div>
+    <div class="topbar__actions">
+      <button class="docs-theme-toggle" type="button" aria-label="Toggle theme"></button>
+    </div>
+  </header>
+
+  <aside data-component="sidebar" data-nav-src="../../../../frontend/portal/assets_v2/ui-kit/mocks/nav-tree-internal.json" aria-label="Section navigation"></aside>
+
+  <main class="container">
+    <article class="docs-prose">
+
+      <header class="page-head">
+        <div class="home-hero__eyebrow">
+          <span class="docs-pill docs-pill--info">ADR · 0017</span>
+          <div class="lifecycle-popover">
+            <a class="docs-pill docs-pill--success" href="0018-adr-lifecycle-ratification-and-badges.html">Accepted</a>
+            <div class="lifecycle-popover__panel" role="tooltip">
+              <span class="lifecycle-popover__title">Lifecycle · this ADR</span>
+              <ol class="lifecycle-popover__stages">
+                <li class="lifecycle-popover__stage" data-stage="decision">
+                  <span class="lifecycle-popover__stage-label">Decision</span>
+                  <ul class="lifecycle-popover__states">
+                    <li>Proposed</li>
+                    <li class="is-current">Accepted</li>
+                    <li>Superseded</li>
+                  </ul>
+                </li>
+                <li class="lifecycle-popover__stage" data-stage="documentation">
+                  <span class="lifecycle-popover__stage-label">Documentation</span>
+                  <ul class="lifecycle-popover__states">
+                    <li>Draft</li>
+                    <li>Ready</li>
+                  </ul>
+                </li>
+                <li class="lifecycle-popover__stage" data-stage="implementation">
+                  <span class="lifecycle-popover__stage-label">Implementation</span>
+                  <ul class="lifecycle-popover__states">
+                    <li>Not started</li>
+                    <li>In progress</li>
+                    <li>Done</li>
+                  </ul>
+                </li>
+              </ol>
+              <a class="lifecycle-popover__link" href="0018-adr-lifecycle-ratification-and-badges.html">Open ADR 0018 →</a>
+            </div>
+          </div>
+        </div>
+        <h1>Branch Naming and Repository Workflow</h1>
+        <div id="docs-top-nav"></div>
+        <p class="lede">
+          Use trunk-based <code>main</code> with prefixed branches, semver tags, and a documented
+          hotfix path so dashboards and release tooling stay scannable without GitFlow ceremony.
+        </p>
+      </header>
+
+      <section aria-labelledby="metadata-h">
+        <h2 id="metadata-h">Metadata</h2>
+        <dl class="svc-meta svc-meta--neutral">
+          <dt>ADR</dt>
+          <dd><code>0017</code> — Branch Naming and Repository Workflow</dd>
+          <dt>Category</dt>
+          <dd>workflow</dd>
+          <dt>Owner</dt>
+          <dd><a href="../../team/people/ivan-boyarkin/index.html">Ivan Boyarkin</a></dd>
+          <dt>Decided on</dt>
+          <dd><time datetime="2026-05-17">2026-05-17</time></dd>
+          <dt>Last reviewed</dt>
+          <dd><time datetime="2026-06-01">2026-06-01</time></dd>
+        </dl>
+      </section>
+
+      <section aria-labelledby="context-h">
+        <h2 id="context-h">Context</h2>
+        <p><strong>Why this matters:</strong> Branch names are metadata. Prefixes like <code>feature/</code> and <code>fix/</code> make dashboards and release tooling scannable. A single integration branch (<code>main</code>) that stays green keeps trunk-based habits simple for small teams—without heavy GitFlow ceremony.</p>
+        <p>Documenting tags, semver, and rare hotfix forward-ports avoids "we only did that once in Slack" knowledge loss.</p>
+      </section>
+
+      <section aria-labelledby="decision-h">
+        <h2 id="decision-h">Decision</h2>
+
+        <h3>Integration branch</h3>
+        <ul>
+          <li><strong><code>main</code></strong> is the default integration branch: it should remain <strong>releasable</strong> (quality gates green on the latest commit). Feature work lands via pull request into <code>main</code> unless a rare exception is agreed (hotfix branch policy below).</li>
+        </ul>
+
+        <h3>Branch naming</h3>
+        <p>Use lowercase ASCII, hyphens as separators, and a short type prefix:</p>
+        <div class="docs-table-wrap">
+          <table class="docs-table docs-table--zebra">
+            <thead>
+              <tr>
+                <th>Prefix</th>
+                <th>Use for</th>
+                <th>Example</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>feature/</code></td>
+                <td>New behavior, API additions, user-visible changes.</td>
+                <td><code>feature/user-export-csv</code></td>
+              </tr>
+              <tr>
+                <td><code>fix/</code></td>
+                <td>Bug fixes and regressions.</td>
+                <td><code>fix/idempotency-409-body</code></td>
+              </tr>
+              <tr>
+                <td><code>services/portal/</code></td>
+                <td>Documentation-only changes under <code>services/portal/</code>, README, ADRs.</td>
+                <td><code>services/portal/adr-0017-branches</code></td>
+              </tr>
+              <tr>
+                <td><code>chore/</code></td>
+                <td>Tooling, CI, formatting sweeps, dependencies without product behavior change.</td>
+                <td><code>chore/bump-ruff</code></td>
+              </tr>
+              <tr>
+                <td><code>refactor/</code></td>
+                <td>Internal restructuring without intended behavior change (still covered by tests).</td>
+                <td><code>refactor/user-service-split</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Optional: suffix or segment with an issue tracker id if the team uses one, e.g. <code>feature/42-export-csv</code> or <code>fix/gh-12-rate-limit</code>. Avoid spaces, underscores except when matching an external id, and very long names—keep the slug readable in Git UI and terminal tabs.</p>
+
+        <h3>Lifespan and updates</h3>
+        <ul>
+          <li>Prefer <strong>one logical change set per branch</strong> per PR when practical; split unrelated edits.</li>
+          <li>Keep the branch reasonably current with <code>main</code> using <strong>rebase</strong> or <strong>merge</strong> from <code>main</code> before merge; choose one style per PR and avoid mixing noisy merge commits unless the team standardizes on merge commits for traceability.</li>
+          <li>After the PR merges, <strong>delete the remote feature branch</strong> when Git hosting offers it, to reduce clutter (local branches may be deleted by the author).</li>
+        </ul>
+
+        <h3>Releases and tags</h3>
+        <ul>
+          <li>Release versions follow <a href="https://semver.org/">Semantic Versioning</a> as already stated in <code>CHANGELOG.md</code> (see <a href="0013-changelog-and-release-notes.html">ADR 0013</a>).</li>
+          <li>Git tags for releases use the form <code>vMAJOR.MINOR.PATCH</code> (e.g. <code>v1.2.0</code>), created on the commit that corresponds to the released changelog section.</li>
+        </ul>
+
+        <h3>Hotfixes</h3>
+        <p>If a production fix must ship without taking everything on <code>main</code>, branch from the tagged release (e.g. <code>fix/prod-1-1-2-null-deref</code>), fix, tag a patch, and forward-port the same commit to <code>main</code> (or cherry-pick) so drift does not accumulate. This is exceptional; default flow remains PR → <code>main</code> → release.</p>
+      </section>
+
+      <section aria-labelledby="scope-h">
+        <h2 id="scope-h">Scope</h2>
+        <ul>
+          <li>In scope: naming, integration model, tags, contributor expectations.</li>
+          <li>Out of scope: Git hosting UI settings (branch protection rules), required reviewers—configure per org policy.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="alternatives-h">
+        <h2 id="alternatives-h">Alternatives considered</h2>
+        <p>Three alternatives evaluated before adopting trunk-based + prefixed branches. Each rejected with a rooted reason.</p>
+        <div class="docs-card-grid docs-card-grid--stack">
+          <article class="docs-card" data-tone="warn">
+            <div class="docs-card__head"><h3 class="docs-card__title">Free-form branch names</h3><span class="docs-pill docs-pill--danger">rejected</span></div>
+            <div class="docs-card__body">
+              <p><strong>Why considered:</strong> zero rules, zero enforcement, every contributor names their branch however.</p>
+              <p><strong>Why rejected:</strong> the changelog path-filter gate (<a href="0013-changelog-and-release-notes.html">ADR 0013</a>) and future automation (per-prefix CI fan-out, auto-labelling of PRs) all depend on being able to read branch metadata. Free-form names forfeit that lever permanently. The cost of prefixing is paid once per branch creation; the cost of free-form is paid every time someone tries to filter PR lists.</p>
+            </div>
+          </article>
+          <article class="docs-card" data-tone="warn">
+            <div class="docs-card__head"><h3 class="docs-card__title">GitFlow with long-lived <code>develop</code></h3><span class="docs-pill docs-pill--danger">rejected</span></div>
+            <div class="docs-card__body">
+              <p><strong>Why considered:</strong> Vincent Driessen's classic — <code>develop</code> integrates, <code>main</code> tracks releases, dedicated <code>release/*</code> branches stabilise. Standard for products with parallel release trains.</p>
+              <p><strong>Why rejected:</strong> GitFlow's mental overhead (5 branch types, explicit merge directions) is calibrated for teams shipping multiple release trains in parallel. We ship one trunk; the «which branch to merge into» question is trivial. GitFlow would add ceremony without the matching benefit.</p>
+            </div>
+          </article>
+          <article class="docs-card" data-tone="warn">
+            <div class="docs-card__head"><h3 class="docs-card__title">Trunk-based without any branches (push to <code>main</code> directly)</h3><span class="docs-pill docs-pill--danger">rejected</span></div>
+            <div class="docs-card__body">
+              <p><strong>Why considered:</strong> some high-velocity teams (e.g. Google's monorepo) commit straight to trunk behind feature flags. Maximum simplicity.</p>
+              <p><strong>Why rejected:</strong> we have no feature-flag infrastructure (backlog <code>BL-013</code>/<code>BL-038</code>) to hide work-in-progress behind. Without flags, direct-to-trunk means every commit must be releasable independently — a constraint our docs-and-spec-heavy PRs cannot meet today. The PR-into-main pattern is the smallest mechanism that gives us reviewable units without forcing every commit to be production-ready.</p>
+            </div>
+          </article>
+        </div>
+        <p><strong>Trade we accept by choosing trunk-based + prefixed branches.</strong> Contributors learn five prefixes (<code>feature/</code>, <code>fix/</code>, <code>services/portal/</code>, <code>chore/</code>, <code>refactor/</code>). We accept it because each rejected alternative either forfeits branch-name automation (free-form), adds ceremony without matching velocity gain (GitFlow), or assumes infrastructure we have not built (direct-to-trunk).</p>
+      </section>
+
+      <section aria-labelledby="consequences-h">
+        <h2 id="consequences-h">Consequences</h2>
+        <div class="docs-card-grid docs-card-grid--stack">
+          <article class="docs-card" data-tone="success">
+            <div class="docs-card__head"><h3 class="docs-card__title">Positive</h3><span class="docs-pill docs-pill--success">wins</span></div>
+            <div class="docs-card__body">
+              <ul>
+                <li>Consistent names in PR lists and local <code>git branch</code> output.</li>
+                <li>Clear place to document hotfix and tagging expectations next to changelog policy.</li>
+              </ul>
+            </div>
+          </article>
+          <article class="docs-card" data-tone="warn">
+            <div class="docs-card__head"><h3 class="docs-card__title">Trade-offs</h3><span class="docs-pill docs-pill--warn">costs</span></div>
+            <div class="docs-card__body">
+              <p>Two named tradeoffs. Shape from <a href="../../handbook/sa/tradeoff-disclosure.html">Tradeoff disclosure</a>.</p>
+              <ul class="rail-list" data-tone="rose">
+                <li><strong>Prefix-naming is policy, not enforcement.</strong> We gain a low-friction convention contributors learn in a day. We lose the «branch with no prefix lands on main» refusal that a server-side hook would give. We accept it because the failure mode of a wrong prefix is «reviewer asks for a rename», which is reversible; the failure mode of a hook is «contributor stuck at push» which corrodes the contributor's confidence in the tooling.</li>
+                <li><strong>Single integration branch (no <code>develop</code>).</strong> We gain the trunk-based simplicity «one branch tells you what is in production». We lose the GitFlow staging buffer where a half-baked feature can sit on <code>develop</code> without leaking to <code>main</code>. We accept it because the buffer's benefit only materialises when there are parallel release trains; with one trunk it is staging-for-its-own-sake.</li>
+              </ul>
+            </div>
+          </article>
+        </div>
+        <h3>Revisit — would we do this again?</h3>
+        <p><strong>Yes.</strong> One refinement we would add on day one:</p>
+        <ul class="rail-list" data-tone="info">
+          <li><strong>Add a GitHub Actions check that fails the PR if the source branch does not match a prefix from the table.</strong> Today the prefix policy is honour-system; a small <code>actions/github-script</code> check would catch the «I forgot to prefix» case at PR open time and rename automation would be one click away.</li>
+        </ul>
+
+      </section>
+
+      <section aria-labelledby="compatibility-h">
+        <h2 id="compatibility-h">Compatibility and migration</h2>
+        <ul>
+          <li><strong>Backward-compatibility impact:</strong> none — pure governance / convention change with no wire-level effect for existing consumers.</li>
+          <li><strong>Migration plan:</strong> apply the rules to new work; bring existing artefacts into compliance during normal touch-ups.</li>
+          <li><strong>Rollback strategy:</strong> revert the merge PR; no data or schema changes to undo.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="implementation-h">
+        <h2 id="implementation-h">Implementation plan</h2>
+        <ol>
+          <li>Adopt the conventions in the Decision section across the repository.</li>
+          <li>Update related templates, runbooks, and CI gates to reflect the rule.</li>
+          <li>Cross-link from CHANGELOG and onboarding docs so future contributors discover the decision.</li>
+        </ol>
+      </section>
+
+      <section aria-labelledby="validation-h">
+        <h2 id="validation-h">Validation</h2>
+        <ul>
+          <li><strong>Technical checks:</strong> CI lints, type-checks, and contract tests stay green on every PR.</li>
+          <li><strong>Operational checks:</strong> the relevant runbook reflects this rule.</li>
+          <li><strong>Documentation updates:</strong> README, CHANGELOG, and related ADRs cross-reference this decision.</li>
+        </ul>
+      </section>
+
+      <footer class="docs-history" aria-label="History">
+        <h2 class="docs-history__title">History</h2>
+        <ul class="docs-history__list">
+          <li class="docs-history__row">
+            <span class="docs-history__date">2026-06-01</span>
+            <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm">@ivan</a>
+            <span class="docs-history__note">Substance audit-pass. Status pill → <code>.lifecycle-popover</code>; thin pros/cons <code>§ Alternatives</code> rewritten with a third real option (direct-to-trunk); <code>§ Trade-offs</code> restructured into canonical entries (prefix-as-policy · single-trunk); new <code>§ Would we do this again?</code> proposing PR-open prefix check. Inline <code>style</code> stripped.</span>
+          </li>
+          <li class="docs-history__row">
+            <span class="docs-history__date">2026-05-17</span>
+            <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm">@ivan</a>
+            <span class="docs-history__note">Migrated to UI Kit v3.</span>
+          </li>
+        </ul>
+      </footer>
+
+    </article>
+  </main>
+
+  <aside class="docs-toc" aria-label="On this page"></aside>
+  <button data-component="toc-fab" type="button" aria-label="On this page" aria-expanded="false"></button>
+
+  <script type="module" src="../../../../frontend/portal/assets_v2/runtime/internal/entry.js"></script>
+
+</body></html>

@@ -1,0 +1,20 @@
+@startuml
+title API run and optional Docker observability
+
+top to bottom direction
+
+package "Host (venv)" {
+  rectangle "make run" as run
+}
+
+package "Docker Compose" {
+  rectangle "docker compose -f services/monitoring/docker-compose.observability.yml up -d" as obup
+  rectangle "docker compose -f services/monitoring/docker-compose.observability.yml down" as obdown
+  rectangle "python scripts/check_observability_links.py" as obsmoke
+}
+
+obup .. run : optional\nalongside
+obup -down-> obsmoke : check
+obsmoke -down-> obdown : stop
+
+@enduml

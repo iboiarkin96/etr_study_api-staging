@@ -1,0 +1,177 @@
+/* ui-kit/components/modal.css — centered dialog used by task-details + diagram-lightbox. */
+
+.docs-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+}
+
+.docs-modal[aria-hidden="false"] {
+  display: flex;
+}
+
+.docs-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.docs-modal__panel {
+  position: relative;
+  z-index: 1;
+  width: min(720px, 100%);
+  max-height: 86vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  transform: translateY(12px) scale(0.98);
+  opacity: 0;
+  animation: docs-modal-enter 220ms var(--ease-spring) forwards;
+}
+
+@keyframes docs-modal-enter {
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.docs-modal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.docs-modal__title {
+  margin: 0;
+  font-size: var(--fs-600);
+  font-weight: var(--fw-semibold);
+  color: var(--text-strong);
+}
+
+.docs-modal__body {
+  padding: var(--space-5);
+  overflow-y: auto;
+  flex: 1 1 auto;
+}
+
+.docs-modal__foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  border-top: 1px solid var(--line-soft);
+  background: var(--bg-mute);
+}
+
+/* Legacy alias — `.docs-modal__close` is the original modal-scoped class
+   name. Visual behaviour is now owned by the generic `.docs-close-btn`
+   component (see ./close-btn.css). This alias keeps existing markup in
+   the kit and docs working without a sweep. New code should use
+   `<button class="docs-close-btn" type="button" data-modal-close>`. */
+.docs-modal__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+  transition: background 140ms var(--ease-out), color 140ms var(--ease-out);
+}
+
+.docs-modal__close:hover {
+  background: var(--bg-mute);
+  color: var(--text);
+}
+
+.docs-modal__close:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .docs-modal__panel {
+    animation: none;
+    transform: none;
+    opacity: 1;
+  }
+}
+
+/* Path modifier — used by cold-start.html so that each curated reading
+   path opens in its own dialog instead of bloating the inline flow. The
+   panel is wider than the default 720 px because each timeline carries
+   8–15 step rows; the head carries the persona kicker and tone via
+   `data-tone` so the modal "rhymes" with the picker tile that opened it. */
+
+.docs-modal--path .docs-modal__panel {
+  --dmp-tone: var(--accent);
+  width: min(880px, 100%);
+  max-height: 88vh;
+  border-top: 3px solid var(--dmp-tone);
+}
+
+.docs-modal--path[data-tone="accent"]  .docs-modal__panel { --dmp-tone: var(--accent); }
+.docs-modal--path[data-tone="info"]    .docs-modal__panel { --dmp-tone: var(--info); }
+.docs-modal--path[data-tone="teal"]    .docs-modal__panel { --dmp-tone: var(--teal); }
+.docs-modal--path[data-tone="rose"]    .docs-modal__panel { --dmp-tone: var(--rose); }
+.docs-modal--path[data-tone="warn"]    .docs-modal__panel { --dmp-tone: var(--warn); }
+.docs-modal--path[data-tone="success"] .docs-modal__panel { --dmp-tone: var(--success); }
+
+.docs-modal--path .docs-modal__head {
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  justify-content: flex-start;
+}
+
+.docs-modal--path .docs-modal__title {
+  flex: 1 1 auto;
+}
+
+.docs-modal--path .docs-modal__close {
+  margin-left: auto;
+  align-self: center;
+}
+
+.docs-modal--path .docs-modal__kicker {
+  font-family: var(--font-mono);
+  font-size: var(--fs-100);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  flex: 0 0 auto;
+}
+
+.docs-modal--path .docs-modal__body > .docs-chip-row {
+  margin-top: 0;
+  margin-bottom: var(--space-4);
+}
+
+.docs-modal--path .docs-modal__body > .numbered-section__lede {
+  margin-bottom: var(--space-5);
+}
+
+.docs-modal--path .docs-modal__body > .path-timeline {
+  margin-top: 0;
+}

@@ -1,0 +1,51 @@
+@startuml
+title ETR Study API — C4 Level 3 (components)
+
+top to bottom direction
+
+actor "Integrator" as Client
+
+package "Presentation" as Pres {
+  together {
+    [User router] as UR
+    [Conspectus router] as CR
+    [Error-log router] as ER
+  }
+  [Pydantic schemas] as Sch
+}
+
+package "Application" as AppPkg {
+  [UserService] as USvc
+  [ConspectusService] as CSvc
+  [ErrorLogService] as ESvc
+  [SchedulePolicy] as Pol
+}
+
+package "Persistence" as PerPkg {
+  [Repositories] as Repo
+  [SQLAlchemy session] as Sess
+}
+
+database "Database" as Db
+
+Client --> UR
+Client --> CR
+Client --> ER
+
+UR --> Sch
+CR --> Sch
+ER --> Sch
+
+UR --> USvc
+CR --> CSvc
+ER --> ESvc
+
+CSvc --> Pol
+USvc --> Repo
+CSvc --> Repo
+ESvc --> Repo
+
+Repo --> Sess
+Sess --> Db
+
+@enduml

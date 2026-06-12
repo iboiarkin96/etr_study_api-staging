@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en" data-portal="internal" data-theme="light"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ADR 0001 · Docs as Code · Study App Internal</title>
+  <script>(function(){try{var v=localStorage.getItem("docs-theme-preference");if(v==="dark"||v==="light")document.documentElement.setAttribute("data-theme",v);}catch(e){}})();</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..900&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="../../../../frontend/portal/assets_v2/favicon.svg">
+  <link rel="stylesheet" href="../../../../frontend/portal/assets_v2/runtime/internal/entry.css">
+</head>
+<body data-page-type="reference" class="docs-shell" data-maintainer-ids="16fc8b78537109162984a2fdbef6e142" data-service="none" data-lifecycle="published" data-updated="2026-06-06" data-role="architect">
+
+  <header class="topbar" role="banner">
+    <a class="topbar__brand" href="../../index.html"><span aria-hidden="true">🛠</span><span>Study App · Internal</span></a>
+    <nav class="topbar__breadcrumbs" aria-label="Breadcrumb">
+      <ol class="docs-breadcrumbs__list">
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="../../index.html">Internal</a></li>
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="../index.html">Governance</a></li>
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="index.html">ADR</a></li>
+        <li class="docs-breadcrumbs__item" aria-current="page">0001</li>
+      </ol>
+    </nav>
+    <div class="topbar__spacer"></div>
+    <div class="topbar__actions">
+      <button class="docs-theme-toggle" type="button" aria-label="Toggle theme"></button>
+    </div>
+  </header>
+
+  <aside data-component="sidebar" data-nav-src="../../../../frontend/portal/assets_v2/ui-kit/mocks/nav-tree-internal.json" aria-label="Section navigation"></aside>
+
+  <main class="container">
+    <article class="docs-prose">
+
+      <header class="page-head">
+        <div class="home-hero__eyebrow">
+          <span class="docs-pill docs-pill--info">ADR · 0001</span>
+          <div class="lifecycle-popover">
+            <a class="docs-pill docs-pill--success" href="0018-adr-lifecycle-ratification-and-badges.html">Accepted</a>
+            <div class="lifecycle-popover__panel" role="tooltip">
+              <span class="lifecycle-popover__title">Lifecycle · this ADR</span>
+              <ol class="lifecycle-popover__stages">
+                <li class="lifecycle-popover__stage" data-stage="decision">
+                  <span class="lifecycle-popover__stage-label">Decision</span>
+                  <ul class="lifecycle-popover__states">
+                    <li>Proposed</li>
+                    <li class="is-current">Accepted</li>
+                    <li>Superseded</li>
+                  </ul>
+                </li>
+                <li class="lifecycle-popover__stage" data-stage="documentation">
+                  <span class="lifecycle-popover__stage-label">Documentation</span>
+                  <ul class="lifecycle-popover__states">
+                    <li>Draft</li>
+                    <li>Ready</li>
+                  </ul>
+                </li>
+                <li class="lifecycle-popover__stage" data-stage="implementation">
+                  <span class="lifecycle-popover__stage-label">Implementation</span>
+                  <ul class="lifecycle-popover__states">
+                    <li>Not started</li>
+                    <li>In progress</li>
+                    <li>Done</li>
+                  </ul>
+                </li>
+              </ol>
+              <a class="lifecycle-popover__link" href="0018-adr-lifecycle-ratification-and-badges.html">Open ADR 0018 →</a>
+            </div>
+          </div>
+        </div>
+        <h1>Adopt Docs as Code</h1>
+        <div id="docs-top-nav"></div>
+        <p class="lede">
+          Treat documentation with the same git workflow, review, and CI gates as application code,
+          so it stays aligned with the runtime behaviour it describes.
+        </p>
+      </header>
+
+      <section aria-labelledby="metadata-h">
+        <h2 id="metadata-h">Metadata</h2>
+        <dl class="svc-meta svc-meta--neutral">
+          <dt>ADR</dt>
+          <dd><code>0001</code> — Adopt Docs as Code</dd>
+          <dt>Category</dt>
+          <dd>documentation</dd>
+          <dt>Owner</dt>
+          <dd><a href="../../team/people/ivan-boyarkin/index.html">Ivan Boyarkin</a></dd>
+          <dt>Decided on</dt>
+          <dd><time datetime="2026-05-17">2026-05-17</time></dd>
+          <dt>Last reviewed</dt>
+          <dd><time datetime="2026-05-30">2026-05-30</time></dd>
+        </dl>
+      </section>
+
+      <section aria-labelledby="context-h">
+        <h2 id="context-h">Context</h2>
+        <p><strong>Why this matters:</strong> Docs that live only in wikis or chat are easy to lose when people leave. They also drift from the code if nothing forces updates together. <em>Docs as Code</em> means we use the same tools as for the app (git, review, CI) for narrative content too: diagrams, API text, and guides move with commits and releases.</p>
+        <p>As the API grows, partners need one place to learn behavior, operators need runbooks that match production, and the team needs onboarding that does not rely on word of mouth. Updates without checks fall behind the real service.</p>
+      </section>
+
+      <section aria-labelledby="decision-h">
+        <h2 id="decision-h">Decision</h2>
+        <p>We use Docs as Code as a standard practice:</p>
+        <ol>
+          <li>Keep documentation in repository and version it with code.</li>
+          <li>Treat OpenAPI contracts, error schemas, and examples as part of public API contract.</li>
+          <li>Use command-driven generation/synchronization for docs artifacts.</li>
+          <li>Enforce documentation checks in quality gates before deployment.</li>
+        </ol>
+      </section>
+
+      <section aria-labelledby="scope-h">
+        <h2 id="scope-h">Scope</h2>
+        <ul>
+          <li><strong>In scope:</strong> the conventions, rules, and artefacts named in the Decision section above.</li>
+          <li><strong>Out of scope:</strong> any system, process, or surface not explicitly listed here.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="alternatives-h">
+        <h2 id="alternatives-h">Alternatives considered</h2>
+        <p>The four alternatives below were considered before adopting Docs as Code. Each is named, evaluated, and explicitly rejected with the reason that drove the decision.</p>
+        <div class="docs-card-grid docs-card-grid--stack">
+          <article class="docs-card" data-tone="warn">
+            <div class="docs-card__head"><h3 class="docs-card__title">Wiki (Confluence / Notion / similar)</h3><span class="docs-pill docs-pill--danger">rejected</span></div>
+            <div class="docs-card__body">
+              <p><strong>Why considered:</strong> familiar tooling, rich-text editing, no markup syntax to learn, search and access control built in.</p>
+              <p><strong>Why rejected:</strong> documentation lives outside the repo, drift between code and docs is the default state, every page edit lacks the review discipline of a PR, and history of "why this was changed" is owned by the wiki's audit log instead of git. Two teams the author worked with previously ended up with stale wikis that nobody trusted within 18 months. The drift problem is the entire motivation for this ADR.</p>
+            </div>
+          </article>
+          <article class="docs-card" data-tone="warn">
+            <div class="docs-card__head"><h3 class="docs-card__title">Static site generator (Hugo / Jekyll / Docusaurus)</h3><span class="docs-pill docs-pill--danger">rejected</span></div>
+            <div class="docs-card__body">
+              <p><strong>Why considered:</strong> Markdown-first authoring, built-in theming, large ecosystem, common choice for developer docs.</p>
+              <p><strong>Why rejected:</strong> adds a build step before pages render, requires a Node or Hugo toolchain on every contributor's machine, and ties the portal's visual identity to a third-party template that we'd then customise heavily. A raw HTML + light Make pipeline produces the same artefact with zero non-Python dependencies and one less layer to debug when something goes wrong. Considered Hugo + a custom theme; the customisation cost exceeded the build-step saving.</p>
+            </div>
+          </article>
+          <article class="docs-card" data-tone="warn">
+            <div class="docs-card__head"><h3 class="docs-card__title">Markdown-only (no rendered HTML companions)</h3><span class="docs-pill docs-pill--danger">rejected</span></div>
+            <div class="docs-card__body">
+              <p><strong>Why considered:</strong> Markdown is the lingua franca for developer docs, renders natively on GitHub, no rendering step needed.</p>
+              <p><strong>Why rejected:</strong> Markdown cannot express the visual structures we rely on (chip rows, paired-card consequences, gradient "What to read next" cards, complex tables with sticky heads). Forcing every page into Markdown either loses these visual structures or routes around Markdown with inline HTML, defeating the simplicity argument. The compromise — author HTML, accept Markdown companions where convenient — preserves the rich kit-component vocabulary without forbidding Markdown.</p>
+            </div>
+          </article>
+          <article class="docs-card" data-tone="warn">
+            <div class="docs-card__head"><h3 class="docs-card__title">Generate everything from code (pure pdoc / OpenAPI-only)</h3><span class="docs-pill docs-pill--danger">rejected</span></div>
+            <div class="docs-card__body">
+              <p><strong>Why considered:</strong> "the code is the documentation" — generate the API reference from docstrings and the OpenAPI baseline, generate everything else from code comments. Zero hand-authored prose.</p>
+              <p><strong>Why rejected:</strong> code-generated docs answer "what does this function do?" but never "why does the system exist?" or "how do I respond to this on-call page?". Tutorials, how-tos, and explanations cannot be generated from code — they describe intent, not behaviour. We use code-generation for the parts that can be (API reference under <code>services/api/code-reference/</code>, error catalogues under <code>errors.html</code>) and hand-author the rest.</p>
+            </div>
+          </article>
+        </div>
+        <p><strong>Trade we accept by choosing Docs as Code.</strong> The hand-authored HTML + <code>make docs-fix</code> pipeline ties documentation to the contributor's git workflow — there is no «edit docs without opening a PR» path. We accept the higher up-front contributor cost (HTML authoring, mandatory <code>make docs-check</code> before commit, slower CI) because the cost of the rejected alternatives is paid every day they're in use, not just at adoption time: wikis drift silently, SSGs add a toolchain, Markdown-only loses kit components, code-generation cannot carry intent. Docs as Code makes the cost visible and lets the pipeline enforce it.</p>
+      </section>
+
+      <section aria-labelledby="consequences-h">
+        <h2 id="consequences-h">Consequences</h2>
+        <div class="docs-card-grid docs-card-grid--stack">
+          <article class="docs-card" data-tone="success">
+            <div class="docs-card__head"><h3 class="docs-card__title">Positive</h3><span class="docs-pill docs-pill--success">wins</span></div>
+            <div class="docs-card__body">
+              <ul>
+                <li>Documentation remains aligned with runtime behavior.</li>
+                <li>Changes are auditable in PR history.</li>
+                <li>Release process blocks stale docs and missing generated artifacts.</li>
+              </ul>
+            </div>
+          </article>
+          <article class="docs-card" data-tone="warn">
+            <div class="docs-card__head"><h3 class="docs-card__title">Trade-offs</h3><span class="docs-pill docs-pill--warn">costs</span></div>
+            <div class="docs-card__body">
+              <p>Three named tradeoffs accepted on purpose. Shape from
+                <a href="../../handbook/sa/tradeoff-disclosure.html">Tradeoff disclosure</a>:
+                «we gain X, we lose Y, we accept it because Z».</p>
+                <ul class="rail-list" data-tone="rose">
+                  <li><strong>Slower pre-release pipeline.</strong> We gain auditable proof that committed docs match generated artefacts. We lose ~30 s per <code>make verify</code> run for <code>docs-fix</code> + diff comparison. We accept it because the alternative — stale generated files merged into <code>main</code> — turns the search index into a liability within a sprint.</li>
+                  <li><strong>Authoring tax on every SWE.</strong> We gain documentation that ships in the same PR as the code it describes (no «I'll update the wiki later»). We lose the option of «docs are someone else's problem» as a contributor mindset. We accept it because the deliverable is the portal, not only the binary (<a href="0026-internal-service-documentation-as-source-of-truth.html">ADR 0026</a>); spec velocity is the load-bearing metric, not feature velocity.</li>
+                  <li><strong>HTML-first authoring vs Markdown ergonomics.</strong> We gain access to kit components (chip rows, paired-card consequences, tables with sticky heads) without inline-HTML workarounds. We lose Markdown's native rendering on GitHub for those pages and accept a slightly higher contributor learning curve. We accept it because the rich-visual vocabulary is what lets the portal carry decision documents at scale; Markdown companions are still supported where they fit.</li>
+                </ul>
+              </div>
+            </article>
+          </div>
+
+          <h3>Revisit — would we do this again?</h3>
+          <p><strong>Yes, verbatim — with two day-one additions.</strong> The four rejected alternatives have aged well: the «wiki drift» failure mode is now documented in three real postmortems (<a href="../../how-to/incidents/postmortems/index.html">postmortem corpus</a>) where contributors did try to short-circuit the gate, and the cost of fixing those drifts confirmed the pipeline-as-policy bet. Two things we would add on day one if starting today:</p>
+          <ul class="rail-list" data-tone="info">
+            <li><strong>Make <code>docs-check</code> a pre-commit hook from day one, not just a pre-PR gate.</strong> We learned this in the 2026-05-07 search-index drift postmortem — pre-commit hooks alone do not catch autogen drift, and developers were committing without running <code>make docs-check</code> first. The hook would have saved the incident.</li>
+            <li><strong>Commit to the substance contract from day one, not retrofit it.</strong> The first ~25 ADRs (this one included) had thin alternatives blocks for the first year; the <a href="../../handbook/sa/substance-contract.html">five-gate substance check</a> only landed in 2026-05. Starting with it as a template would have saved the audit-pass that produced this very revision.</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="compatibility-h">
+          <h2 id="compatibility-h">Compatibility and migration</h2>
+          <ul>
+            <li><strong>Backward-compatibility impact:</strong> none — pure governance / convention change with no wire-level effect for existing consumers.</li>
+            <li><strong>Migration plan:</strong> apply the rules to new work; bring existing artefacts into compliance during normal touch-ups.</li>
+            <li><strong>Rollback strategy:</strong> revert the merge PR; no data or schema changes to undo.</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="implementation-h">
+          <h2 id="implementation-h">Implementation in this repository</h2>
+
+          <h3>Section entry points: <code>index.html</code></h3>
+          <p>Each documentation <strong>section</strong> under <code>services/portal/</code> uses a single HTML entry file named <code>index.html</code>, so paths are consistent and predictable when browsing the tree in the editor or on Git hosting. Link to the section as <code>…/section/index.html</code>.</p>
+          <ul>
+            <li><code>services/portal/internal/roles/dev/index.html</code> — SWE role hub (engineering workflow, mandatory standards, practice index).</li>
+            <li><code>services/portal/internal/governance/adr/index.html</code> — ADR index.</li>
+            <li><code>services/portal/internal/how-to/incidents/runbooks/index.html</code> — runbooks index.</li>
+            <li><code>services/portal/internal/governance/backlog/index.html</code> — product and quality backlog.</li>
+          </ul>
+
+          <h3>Other human-readable docs</h3>
+          <div class="docs-table-wrap" role="region" aria-label="Other human-readable docs and tooling">
+            <table class="docs-table docs-table--zebra">
+              <thead>
+                <tr>
+                  <th scope="col">Category</th>
+                  <th scope="col">Path / target</th>
+                  <th scope="col">Note</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Human docs</td>
+                  <td><code>README.md</code></td>
+                  <td>repository root</td>
+                </tr>
+                <tr>
+                  <td>Human docs</td>
+                  <td><code>services/portal/internal/explanation/methodology.html</code></td>
+                  <td>learning methodology (ETR narrative; non-normative for APIs)</td>
+                </tr>
+                <tr>
+                  <td>Diagram sources</td>
+                  <td><code>services/portal/internal/uml/**/*.puml</code></td>
+                  <td>—</td>
+                </tr>
+                <tr>
+                  <td>Generated diagrams</td>
+                  <td><code>services/portal/internal/uml/rendered/*.svg</code></td>
+                  <td>rendered from <code>.puml</code> sources</td>
+                </tr>
+                <tr>
+                  <td>Sync tooling</td>
+                  <td><code>tools/docs/regenerate_docs.py</code></td>
+                  <td>—</td>
+                </tr>
+                <tr>
+                  <td>Sync tooling</td>
+                  <td><code>tools/docs/sync_docs.py</code></td>
+                  <td>—</td>
+                </tr>
+                <tr>
+                  <td>Make targets</td>
+                  <td><code>make docs-fix</code></td>
+                  <td>—</td>
+                </tr>
+                <tr>
+                  <td>Make targets</td>
+                  <td><code>make docs-check</code></td>
+                  <td>included in the canonical <code>make verify</code> locally and in CI</td>
+                </tr>
+                <tr>
+                  <td>Make targets</td>
+                  <td><code>make release-check</code></td>
+                  <td>—</td>
+                </tr>
+                <tr>
+                  <td>Make targets</td>
+                  <td><code>make release DEPLOY_CMD="..."</code></td>
+                  <td>—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Authoring model</h3>
+          <p>Narrative documentation under <code>services/portal/internal/governance/adr/</code>, <code>services/portal/internal/team/roles/swe/</code>, <code>services/portal/internal/how-to/incidents/runbooks/</code>, and related trees is <strong>authored as HTML</strong> and normalized by <code>tools/docs/format_docs_html.py</code>. Optional Markdown files (<code>*.md</code>) in those folders are supported: when present, <code>tools/docs/render_docs_html.py</code> writes companion <code>*.html</code> next to them. Markdown is not required for those sections.</p>
+
+          <h3>Quality gate: <code>docs-check</code></h3>
+          <p><code>make docs-check</code> records <code>git diff HEAD</code>, runs <code>docs-fix</code>, and compares the diff again. If anything changed, committed generated output was stale — run <code>make docs-fix</code> and commit. See <a href="../../services/portal/how-to/docs-pipeline.html">Documentation pipeline</a>.</p>
+        </section>
+
+        <section aria-labelledby="validation-h">
+          <h2 id="validation-h">Validation</h2>
+          <ul>
+            <li><strong>Technical checks:</strong> CI lints, type-checks, and contract tests stay green on every PR.</li>
+            <li><strong>Operational checks:</strong> the relevant runbook reflects this rule.</li>
+            <li><strong>Documentation updates:</strong> README, CHANGELOG, and related ADRs cross-reference this decision.</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="usage-h">
+          <h2 id="usage-h">Usage</h2>
+          <p>Typical workflow:</p>
+          <pre><code>make test
+make docs-fix
+          make release-check</code></pre>
+        </section>
+
+        <footer class="docs-history" aria-label="History">
+          <h2 class="docs-history__title">History</h2>
+          <ul class="docs-history__list">
+            <li class="docs-history__row">
+              <span class="docs-history__date">2026-05-30</span>
+              <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm">@ivan</a>
+              <span class="docs-history__note">Substance audit-pass against the <a href="../../handbook/sa/tradeoff-disclosure.html">tradeoff-disclosure five-gate</a>. Result before: 4/5 (missing explicit accept-clause; <code>§ Consequences &gt; Trade-offs</code> was 2 unstructured bullets). Patch: <code>§ Consequences &gt; Trade-offs</code> restructured into three canonical «we gain X, we lose Y, we accept Z» entries on <code>rail-list</code>; new closing paragraph in <code>§ Alternatives considered</code> names the trade we accept by choosing Docs as Code over the four rejected alternatives; new <code>§ Would we do this again?</code> section ratifies the decision and names two day-one additions (pre-commit hook for <code>docs-check</code>, substance contract from the start). Inline <code>style</code> on the lede stripped (no per-page CSS rule). Closes Vol. 2 audit High gap #7 («ADR alternatives weak») for this ADR.</span>
+            </li>
+            <li class="docs-history__row">
+              <span class="docs-history__date">2026-05-17</span>
+              <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm">@ivan</a>
+              <span class="docs-history__note">Migrated to UI Kit v3 (entry.css, docs-shell, page-head, consequences as paired tone cards).</span>
+            </li>
+          </ul>
+        </footer>
+
+      </article>
+    </main>
+
+    <aside class="docs-toc" aria-label="On this page"></aside>
+    <button data-component="toc-fab" type="button" aria-label="On this page" aria-expanded="false"></button>
+
+    <script type="module" src="../../../../frontend/portal/assets_v2/runtime/internal/entry.js"></script>
+
+  </body></html>

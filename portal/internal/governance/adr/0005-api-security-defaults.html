@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en" data-portal="internal" data-theme="light"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ADR 0005 · API Security Defaults · Study App Internal</title>
+  <script>(function(){try{var v=localStorage.getItem("docs-theme-preference");if(v==="dark"||v==="light")document.documentElement.setAttribute("data-theme",v);}catch(e){}})();</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..900&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="../../../../frontend/portal/assets_v2/favicon.svg">
+  <link rel="stylesheet" href="../../../../frontend/portal/assets_v2/runtime/internal/entry.css">
+</head>
+<body data-page-type="reference" class="docs-shell" data-maintainer-ids="16fc8b78537109162984a2fdbef6e142" data-service="none" data-lifecycle="published" data-updated="2026-06-06" data-role="architect">
+
+  <header class="topbar" role="banner">
+    <a class="topbar__brand" href="../../index.html"><span aria-hidden="true">🛠</span><span>Study App · Internal</span></a>
+    <nav class="topbar__breadcrumbs" aria-label="Breadcrumb">
+      <ol class="docs-breadcrumbs__list">
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="../../index.html">Internal</a></li>
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="../index.html">Governance</a></li>
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="index.html">ADR</a></li>
+        <li class="docs-breadcrumbs__item" aria-current="page">0005</li>
+      </ol>
+    </nav>
+    <div class="topbar__spacer"></div>
+    <div class="topbar__actions">
+      <button class="docs-theme-toggle" type="button" aria-label="Toggle theme"></button>
+    </div>
+  </header>
+
+  <aside data-component="sidebar" data-nav-src="../../../../frontend/portal/assets_v2/ui-kit/mocks/nav-tree-internal.json" aria-label="Section navigation"></aside>
+
+  <main class="container">
+    <article class="docs-prose">
+
+      <header class="page-head">
+        <div class="home-hero__eyebrow">
+          <span class="docs-pill docs-pill--info">ADR · 0005</span>
+          <div class="lifecycle-popover">
+            <a class="docs-pill docs-pill--success" href="0018-adr-lifecycle-ratification-and-badges.html">Accepted</a>
+            <div class="lifecycle-popover__panel" role="tooltip">
+              <span class="lifecycle-popover__title">Lifecycle · this ADR</span>
+              <ol class="lifecycle-popover__stages">
+                <li class="lifecycle-popover__stage" data-stage="decision">
+                  <span class="lifecycle-popover__stage-label">Decision</span>
+                  <ul class="lifecycle-popover__states">
+                    <li>Proposed</li>
+                    <li class="is-current">Accepted</li>
+                    <li>Superseded</li>
+                  </ul>
+                </li>
+                <li class="lifecycle-popover__stage" data-stage="documentation">
+                  <span class="lifecycle-popover__stage-label">Documentation</span>
+                  <ul class="lifecycle-popover__states">
+                    <li>Draft</li>
+                    <li>Ready</li>
+                  </ul>
+                </li>
+                <li class="lifecycle-popover__stage" data-stage="implementation">
+                  <span class="lifecycle-popover__stage-label">Implementation</span>
+                  <ul class="lifecycle-popover__states">
+                    <li>Not started</li>
+                    <li>In progress</li>
+                    <li>Done</li>
+                  </ul>
+                </li>
+              </ol>
+              <a class="lifecycle-popover__link" href="0018-adr-lifecycle-ratification-and-badges.html">Open ADR 0018 →</a>
+            </div>
+          </div>
+        </div>
+        <h1>API Security Defaults</h1>
+        <div id="docs-top-nav"></div>
+        <p class="lede">
+          One security baseline for every <code>/api/v1/*</code> route: rate limit, CORS allowlist, headers, body cap, and a default auth strategy.
+        </p>
+      </header>
+
+      <section aria-labelledby="metadata-h">
+        <h2 id="metadata-h">Metadata</h2>
+        <dl class="svc-meta svc-meta--neutral">
+          <dt>ADR</dt>
+          <dd><code>0005</code> — API Security Defaults</dd>
+          <dt>Category</dt>
+          <dd>security</dd>
+          <dt>Owner</dt>
+          <dd><a href="../../team/people/ivan-boyarkin/index.html">Ivan Boyarkin</a></dd>
+          <dt>Decided on</dt>
+          <dd><time datetime="2026-05-17">2026-05-17</time></dd>
+          <dt>Last reviewed</dt>
+          <dd><time datetime="2026-06-01">2026-06-01</time></dd>
+        </dl>
+      </section>
+
+      <section aria-labelledby="context-h">
+        <h2 id="context-h">Context</h2>
+        <p><strong>Why this matters:</strong> Security is not one switch — it is a set of defaults: who may call the API, how much traffic they can send, which browser origins we trust, and how large bodies may be. If those defaults differ between a laptop and staging/production, teams often find gaps only after abuse or incidents.</p>
+        <p>Set a baseline early (even with mock auth) so integrators learn real headers and keys. Moving later to real identity is then mostly configuration, not a full redesign.</p>
+      </section>
+
+      <section aria-labelledby="decision-h">
+        <h2 id="decision-h">Decision</h2>
+        <p>Protected routes under <code>/api/v1/*</code> share one security baseline:</p>
+        <ol>
+          <li>Per-client rate limiting is enabled by default.</li>
+          <li>CORS is allowlist-based and configured from environment.</li>
+          <li>Security headers are attached to every response.</li>
+          <li>Request body size is capped via configurable global limit.</li>
+          <li>Basic auth strategy is required in all environments; current default is mock API-key auth.</li>
+        </ol>
+      </section>
+
+      <section aria-labelledby="scope-h">
+        <h2 id="scope-h">Scope</h2>
+        <ul>
+          <li><strong>In scope:</strong> the conventions, rules, and artefacts named in the Decision section above.</li>
+          <li><strong>Out of scope:</strong> any system, process, or surface not explicitly listed here.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="alternatives-h">
+        <h2 id="alternatives-h">Alternatives considered</h2>
+        <p>Three alternatives were evaluated before committing to the single-baseline middleware. Each is real (another serious team in the industry uses it) and explicitly rejected with a reason rooted in our constraints.</p>
+        <div class="docs-card-grid docs-card-grid--stack">
+          <article class="docs-card" data-tone="warn">
+            <div class="docs-card__head"><h3 class="docs-card__title">Per-route ad-hoc security (no middleware baseline)</h3><span class="docs-pill docs-pill--danger">rejected</span></div>
+            <div class="docs-card__body">
+              <p><strong>Why considered:</strong> the most flexible approach — each router declares its own auth dependency, its own rate limit, its own body size cap. Common in early-stage Express / FastAPI codebases that have not yet centralised middleware.</p>
+              <p><strong>Why rejected:</strong> drift. The day someone forgets the auth dependency on a new endpoint is the day the endpoint ships unprotected. With a centralised middleware the contract is «every route under <code>/api/v1/*</code> is protected by default»; opt-out is the explicit deviation, not the default. The failure mode this ADR exists to prevent is the per-route variant's normal operating state.</p>
+            </div>
+          </article>
+          <article class="docs-card" data-tone="warn">
+            <div class="docs-card__head"><h3 class="docs-card__title">API gateway in front (Kong / AWS API Gateway / Cloudflare Workers)</h3><span class="docs-pill docs-pill--danger">rejected</span></div>
+            <div class="docs-card__body">
+              <p><strong>Why considered:</strong> standard mid-size pattern — terminate rate limiting, auth, CORS, and body caps at an edge gateway, leaving the app service to handle only business logic. Lets the gateway scale independently and centralises observability of edge failures.</p>
+              <p><strong>Why rejected:</strong> infra dependency. Adding a gateway means local dev needs to emulate it (Kong-in-Docker, AWS SAM local, or a Workers stub), and every contributor has to know two failure modes — app and gateway. We run one FastAPI service in production; adding a gateway overshoots the operating complexity by ~5× without a matching benefit. The day we have multiple backend services is the day to revisit, not before.</p>
+            </div>
+          </article>
+          <article class="docs-card" data-tone="warn">
+            <div class="docs-card__head"><h3 class="docs-card__title">OAuth 2.0 / OIDC provider from day one (Auth0 / Keycloak / Cognito)</h3><span class="docs-pill docs-pill--danger">rejected</span></div>
+            <div class="docs-card__body">
+              <p><strong>Why considered:</strong> the «do auth right from the start» argument — bring in a real identity provider, real JWTs, real token rotation, so migration later is a no-op. Used by enterprise teams who already have an IdP.</p>
+              <p><strong>Why rejected:</strong> we are single-tenant, single-integrator, and the API key is the tenant (the composite <code>(system_user_id, system_uuid)</code> is the learner inside the tenant). OIDC machinery — discovery, JWKS rotation, refresh-token flow, identity-claim mapping — is empty ceremony until there is more than one integrator and more than one identity provider. The current mock API-key strategy + the <code>API_AUTH_STRATEGY</code> switch makes the future swap a configuration change, not a redesign.</p>
+            </div>
+          </article>
+        </div>
+        <p><strong>Trade we accept by choosing one middleware baseline + mock-auth default.</strong> We pay ~30 min of local-setup overhead per contributor (configuring env vars to match the baseline) and live with single-process rate-limit accuracy until we have a second replica. We accept it because each rejected alternative either invites the exact drift this ADR exists to prevent (per-route ad-hoc), demands infra we have not justified (API gateway), or accepts machinery whose value is zero at our scale (OIDC). The baseline is the smallest mechanism that is both <em>uniform</em> and <em>visible</em>.</p>
+      </section>
+
+      <section aria-labelledby="consequences-h">
+        <h2 id="consequences-h">Consequences</h2>
+        <div class="docs-card-grid docs-card-grid--stack">
+          <article class="docs-card" data-tone="success">
+            <div class="docs-card__head"><h3 class="docs-card__title">Positive</h3><span class="docs-pill docs-pill--success">wins</span></div>
+            <div class="docs-card__body">
+              <ul>
+                <li>Security constraints are explicit and testable from day one.</li>
+                <li>Client teams know non-functional contract limits early.</li>
+                <li>Future migration to production auth can replace mock strategy without policy rewrite.</li>
+              </ul>
+            </div>
+          </article>
+          <article class="docs-card" data-tone="warn">
+            <div class="docs-card__head"><h3 class="docs-card__title">Trade-offs</h3><span class="docs-pill docs-pill--warn">costs</span></div>
+            <div class="docs-card__body">
+              <p>Two named tradeoffs accepted on purpose. Shape from
+                <a href="../../handbook/sa/tradeoff-disclosure.html">Tradeoff disclosure</a>:
+                «we gain X, we lose Y, we accept it because Z».</p>
+                <ul class="rail-list" data-tone="rose">
+                  <li><strong>One baseline across every environment.</strong> We gain dev ≡ staging ≡ prod — no «works on my laptop, fails when the rate limiter is on» class of incidents. We lose the faster dev loop you get when CORS, rate-limit, and body cap are disabled locally. We accept it because dev/prod drift is the exact incident class this ADR exists to prevent; the dev-loop delta is ~50 ms per request and never compounds, while drift fails open at 2 a.m. and burns SLO.</li>
+                  <li><strong>In-memory, process-local rate limit.</strong> We gain zero-infra enforcement at sub-millisecond cost (<code>services/api/app/core/security.py</code> sliding window). We lose multi-instance accuracy — each replica enforces its own window, so an attacker hitting two replicas gets 2× the allowance. We accept it because we run single-instance today; the trigger to swap to Redis is «two replicas in production», not «hit some throughput threshold».</li>
+                </ul>
+              </div>
+            </article>
+          </div>
+
+          <h3>Revisit — would we do this again?</h3>
+          <p><strong>Yes, with one piece of homework we should have done in week 1.</strong> The baseline-middleware bet has aged well — there is still no daily «forgot to attach auth» incident, and the dev ≡ prod equivalence has paid back on every contributor onboarding. One thing we would commit to on day one if starting today:</p>
+          <ul class="rail-list" data-tone="info">
+            <li><strong>Write a threat model first (STRIDE + adversary tiers), then derive these defaults from it.</strong> Today the rate-limit, CORS allowlist, and body cap are <em>defaults we believe are right</em>; they would be <em>controls that defend against a named tier of attacker</em> if a threat model existed. Vol. 2 audit High gap #4 names this — the threat-model page is the missing «receipts» for this ADR. Each control here would cite the tier it mitigates (T2 motivated attacker, T3 script kiddies), and the «we accept X out of scope» line would be in the threat model instead of implicit. We retrofit this; would have been free at day one.</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="compatibility-h">
+          <h2 id="compatibility-h">Compatibility and migration</h2>
+          <ul>
+            <li><strong>Backward-compatibility impact:</strong> none — pure governance / convention change with no wire-level effect for existing consumers.</li>
+            <li><strong>Migration plan:</strong> apply the rules to new work; bring existing artefacts into compliance during normal touch-ups.</li>
+            <li><strong>Rollback strategy:</strong> revert the merge PR; no data or schema changes to undo.</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="implementation-h">
+          <h2 id="implementation-h">Implementation in this repository</h2>
+          <div class="docs-table-wrap" role="region" aria-label="Security baseline implementation surfaces">
+            <table class="docs-table docs-table--zebra">
+              <thead>
+                <tr>
+                  <th scope="col">Category</th>
+                  <th scope="col">Path / target</th>
+                  <th scope="col">Note</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Security middleware</td>
+                  <td><code>services/api/app/core/security.py</code></td>
+                  <td>part of application startup defaults</td>
+                </tr>
+                <tr>
+                  <td>Analyst-facing constraints</td>
+                  <td><code>services/portal/internal/analysis/system-design.html</code></td>
+                  <td>—</td>
+                </tr>
+                <tr>
+                  <td>SWE checklist</td>
+                  <td><code>services/portal/internal/handbook/developer/index.html</code></td>
+                  <td>—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section aria-labelledby="validation-h">
+          <h2 id="validation-h">Validation</h2>
+          <ul>
+            <li><strong>Technical checks:</strong> CI lints, type-checks, and contract tests stay green on every PR.</li>
+            <li><strong>Operational checks:</strong> the relevant runbook reflects this rule.</li>
+            <li><strong>Documentation updates:</strong> README, CHANGELOG, and related ADRs cross-reference this decision.</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="config-h">
+          <h2 id="config-h">Configuration</h2>
+          <div class="docs-table-wrap" role="region" aria-label="Security baseline environment variables">
+            <table class="docs-table docs-table--zebra">
+              <thead>
+                <tr>
+                  <th scope="col">Concern</th>
+                  <th scope="col">Environment variables</th>
+                  <th scope="col">Note</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Rate limiting</td>
+                  <td><code>API_RATE_LIMIT_REQUESTS</code>, <code>API_RATE_LIMIT_WINDOW_SECONDS</code></td>
+                  <td>per-client sliding window</td>
+                </tr>
+                <tr>
+                  <td>Body cap</td>
+                  <td><code>API_BODY_MAX_BYTES</code></td>
+                  <td>global limit; over-cap returns 413</td>
+                </tr>
+                <tr>
+                  <td>CORS</td>
+                  <td><code>CORS_ALLOW_ORIGINS</code>, <code>CORS_ALLOW_METHODS</code>, <code>CORS_ALLOW_HEADERS</code>, <code>CORS_ALLOW_CREDENTIALS</code></td>
+                  <td>allowlist-based; never <code>*</code> in production</td>
+                </tr>
+                <tr>
+                  <td>Auth</td>
+                  <td><code>API_AUTH_STRATEGY</code>, <code>API_MOCK_API_KEY</code>, <code>API_AUTH_HEADER</code>, <code>API_PROTECTED_PREFIX</code></td>
+                  <td>current default: mock API-key strategy; production swap is configuration only</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section aria-labelledby="contract-h">
+          <h2 id="contract-h">Contract impact</h2>
+          <ul>
+            <li>Unauthorized requests return <code>401</code> with stable security error payload.</li>
+            <li>Body overflow returns <code>413</code>.</li>
+            <li>Rate-limit overflow returns <code>429</code> and <code>Retry-After</code> header.</li>
+            <li>Protected endpoint docs must include these responses in OpenAPI.</li>
+          </ul>
+        </section>
+
+        <footer class="docs-history" aria-label="History">
+          <h2 class="docs-history__title">History</h2>
+          <ul class="docs-history__list">
+            <li class="docs-history__row">
+              <span class="docs-history__date">2026-06-01</span>
+              <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm">@ivan</a>
+              <span class="docs-history__note">Substance audit-pass against the <a href="../../handbook/sa/tradeoff-disclosure.html">tradeoff-disclosure five-gate</a>. Result before: 1/5 (no <code>§ Alternatives considered</code>; <code>§ Consequences &gt; Trade-offs</code> was 2 unstructured bullets; no accept-clause; reasons partially rooted). Patch: new <code>§ Alternatives considered</code> with three real industry alternatives rejected with rooted reasons (per-route ad-hoc · API gateway · OAuth/OIDC from day one); <code>§ Consequences &gt; Trade-offs</code> restructured into two canonical «we gain X, we lose Y, we accept Z» entries on <code>rail-list</code>; closing accept-clause after the alternatives; new <code>§ Would we do this again?</code> section pointing at the missing threat model (Vol. 2 audit gap #4); <code>§ Configuration</code> and <code>§ Implementation</code> nested-list inventories converted to <code>.docs-table</code>; status pill upgraded to <code>.lifecycle-popover</code>; inline <code>style</code> stripped. Closes Vol. 2 audit High gap #7 for this ADR.</span>
+            </li>
+            <li class="docs-history__row">
+              <span class="docs-history__date">2026-05-17</span>
+              <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm">@ivan</a>
+              <span class="docs-history__note">Migrated to UI Kit v3 (entry.css, docs-shell, page-head, consequences as paired tone cards).</span>
+            </li>
+          </ul>
+        </footer>
+
+      </article>
+    </main>
+
+    <aside class="docs-toc" aria-label="On this page"></aside>
+    <button data-component="toc-fab" type="button" aria-label="On this page" aria-expanded="false"></button>
+
+    <script type="module" src="../../../../frontend/portal/assets_v2/runtime/internal/entry.js"></script>
+
+  </body></html>

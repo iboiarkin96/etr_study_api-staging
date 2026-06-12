@@ -1,0 +1,34 @@
+@startuml
+title ETR Study API — Create conspectus
+
+autonumber
+hide footbox
+
+actor "Integrator" as Client
+boundary "HTTP API" as Api
+control "ConspectusService" as Service
+participant "SchedulePolicy" as Policy
+database "DB (transaction)" as Db
+
+Client -> Api: POST /api/v1/conspectuses
+activate Api
+Api -> Api: validate payload
+
+alt invalid
+  Api --> Client: 422
+  deactivate Api
+else valid
+  Api -> Service: create(user, payload)
+  activate Service
+  Service -> Policy: initial slot / next_review_at
+  Policy --> Service
+  Service -> Db: INSERT conspectus, conspectus_schedule
+  Service -> Db: INSERT conspectus_events (CREATED)
+  Db --> Service
+  Service --> Api: DTO
+  deactivate Service
+  Api --> Client: 201 Created
+  deactivate Api
+end
+
+@enduml

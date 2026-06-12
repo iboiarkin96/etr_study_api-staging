@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en" data-portal="internal" data-theme="light"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ADR 0011 · SLOs, SLAs, Error Budget, and Monitoring Alerts · Study App Internal</title>
+  <script>(function(){try{var v=localStorage.getItem("docs-theme-preference");if(v==="dark"||v==="light")document.documentElement.setAttribute("data-theme",v);}catch(e){}})();</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..900&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="../../../../frontend/portal/assets_v2/favicon.svg">
+  <link rel="stylesheet" href="../../../../frontend/portal/assets_v2/runtime/internal/entry.css">
+</head>
+<body data-page-type="reference" class="docs-shell" data-maintainer-ids="16fc8b78537109162984a2fdbef6e142" data-service="none" data-lifecycle="published" data-updated="2026-06-06" data-role="architect">
+
+  <header class="topbar" role="banner">
+    <a class="topbar__brand" href="../../index.html"><span aria-hidden="true">🛠</span><span>Study App · Internal</span></a>
+    <nav class="topbar__breadcrumbs" aria-label="Breadcrumb">
+      <ol class="docs-breadcrumbs__list">
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="../../index.html">Internal</a></li>
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="../index.html">Governance</a></li>
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="index.html">ADR</a></li>
+        <li class="docs-breadcrumbs__item" aria-current="page">0011</li>
+      </ol>
+    </nav>
+    <div class="topbar__spacer"></div>
+    <div class="topbar__actions">
+      <button class="docs-theme-toggle" type="button" aria-label="Toggle theme"></button>
+    </div>
+  </header>
+
+  <aside data-component="sidebar" data-nav-src="../../../../frontend/portal/assets_v2/ui-kit/mocks/nav-tree-internal.json" aria-label="Section navigation"></aside>
+
+  <main class="container">
+    <article class="docs-prose">
+
+      <header class="page-head">
+        <div class="home-hero__eyebrow">
+          <span class="docs-pill docs-pill--info">ADR · 0011</span>
+          <div class="lifecycle-popover">
+            <a class="docs-pill docs-pill--success" href="0018-adr-lifecycle-ratification-and-badges.html">Accepted</a>
+            <div class="lifecycle-popover__panel" role="tooltip">
+              <span class="lifecycle-popover__title">Lifecycle · this ADR</span>
+              <ol class="lifecycle-popover__stages">
+                <li class="lifecycle-popover__stage" data-stage="decision">
+                  <span class="lifecycle-popover__stage-label">Decision</span>
+                  <ul class="lifecycle-popover__states">
+                    <li>Proposed</li>
+                    <li class="is-current">Accepted</li>
+                    <li>Superseded</li>
+                  </ul>
+                </li>
+                <li class="lifecycle-popover__stage" data-stage="documentation">
+                  <span class="lifecycle-popover__stage-label">Documentation</span>
+                  <ul class="lifecycle-popover__states">
+                    <li>Draft</li>
+                    <li>Ready</li>
+                  </ul>
+                </li>
+                <li class="lifecycle-popover__stage" data-stage="implementation">
+                  <span class="lifecycle-popover__stage-label">Implementation</span>
+                  <ul class="lifecycle-popover__states">
+                    <li>Not started</li>
+                    <li>In progress</li>
+                    <li>Done</li>
+                  </ul>
+                </li>
+              </ol>
+              <a class="lifecycle-popover__link" href="0018-adr-lifecycle-ratification-and-badges.html">Open ADR 0018 →</a>
+            </div>
+          </div>
+        </div>
+        <h1>SLOs, SLAs, Error Budget, and Monitoring Alerts</h1>
+        <div id="docs-top-nav"></div>
+        <p class="lede">
+          Explicit SLIs and 30-day SLOs (availability, latency p95, readiness), a 0.1% error budget with burn alerts, and Blackbox-probed readiness — all wired into Prometheus rules.
+        </p>
+      </header>
+
+      <section aria-labelledby="metadata-h">
+        <h2 id="metadata-h">Metadata</h2>
+        <dl class="svc-meta svc-meta--neutral">
+          <dt>ADR</dt>
+          <dd><code>0011</code> — SLOs, SLAs, Error Budget, and Monitoring Alerts</dd>
+          <dt>Category</dt>
+          <dd>operations</dd>
+          <dt>Owner</dt>
+          <dd><a href="../../team/people/ivan-boyarkin/index.html">Ivan Boyarkin</a></dd>
+          <dt>Decided on</dt>
+          <dd><time datetime="2026-05-17">2026-05-17</time></dd>
+          <dt>Last reviewed</dt>
+          <dd><time datetime="2026-06-01">2026-06-01</time></dd>
+        </dl>
+      </section>
+
+      <section aria-labelledby="context-h">
+        <h2 id="context-h">Context</h2>
+        <p><strong>Why this matters:</strong> Dashboards alone do not answer “are we allowed to ship today?” <strong>Service level objectives (SLOs)</strong> turn metrics into targets (for example “99.9% of requests succeed without 5xx”). An <strong>error budget</strong> is the allowed failure slice implied by that target; when it is exhausted, the team slows feature work and fixes reliability—an idea popularized by Google SRE and widely adopted in the industry.</p>
+        <p><a href="0009-health-readiness-and-observability.html">ADR 0009</a> added metrics and probes. This ADR adds explicit SLIs/SLOs, budget-style burn signals, and alerts so on-call responds to customer-impacting risk, not arbitrary thresholds.</p>
+      </section>
+
+      <section aria-labelledby="decision-h">
+        <h2 id="decision-h">Decision</h2>
+        <h3>Service level indicators (SLIs)</h3>
+        <ul>
+          <li><strong>HTTP availability (5xx)</strong> — fraction of requests that do not return a 5xx status, measured from <code>http_requests_total</code> (Prometheus job <code>study-app-api</code>).</li>
+          <li><strong>API latency</strong> — 95th percentile of <code>http_request_duration_seconds</code> for routes whose <code>path_template</code> is not <code>/metrics</code>, <code>/live</code>, or <code>/ready</code>, so health and scrape traffic do not dominate the SLI.</li>
+          <li><strong>Readiness</strong> — success of an HTTP GET to <code>/ready</code> expecting status 200, measured via the Prometheus <a href="https://github.com/prometheus/blackbox_exporter">Blackbox exporter</a> (job <code>study-app-blackbox</code>, metric <code>probe_success</code>). This reflects dependency readiness; it is distinct from the HTTP error SLI on application routes.</li>
+        </ul>
+
+        <h3>Service level objectives (SLOs)</h3>
+        <p>Targets are evaluated over a <strong>rolling 30-day</strong> window unless stated otherwise.</p>
+        <div class="docs-table-wrap">
+          <table class="docs-table docs-table--zebra">
+            <thead>
+              <tr>
+                <th>SLI</th>
+                <th>Objective</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>HTTP availability (non-5xx)</td>
+                <td>99.9% of requests succeed without 5xx</td>
+                <td>Complementary view: 5xx ratio must stay within 0.1% of traffic over the window.</td>
+              </tr>
+              <tr>
+                <td>API latency (p95)</td>
+                <td>95% of in-scope requests complete in under 500 ms</td>
+                <td>Measured as histogram p95 over 5 min rate windows for alerting; SLO is a monthly/rolling intent.</td>
+              </tr>
+              <tr>
+                <td>Readiness probe</td>
+                <td><code>/ready</code> returns HTTP 200 at least 99.9% of probe intervals</td>
+                <td>Blackbox-based; indicates DB and dependency health from outside the process.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Error budget</h3>
+        <p>For HTTP availability, the <strong>allowed bad event ratio</strong> is <code>1 − 0.999 = 0.001</code> (0.1% of requests may fail with 5xx over the rolling window). Prometheus recording rules expose <code>job:study_app:http_5xx:burn30d</code>: the ratio of actual 5xx share to the allowed 0.001 share. Values above <code>1</code> mean the error budget for the window is exhausted.</p>
+        <p>Fast burn (short windows) and sustained high 5xx rates are alerted separately so on-call can act before the full 30-day budget is consumed.</p>
+
+        <h3>Optional external SLA</h3>
+        <p>An <strong>SLA</strong> is a commitment to customers or internal consumers (support tickets, credits, page). This ADR defines internal <strong>SLOs</strong> only. If a public SLA is published, it should be <em>equal to or stricter than</em> these SLOs, with measurement clauses referencing Prometheus/Grafana and the <a href="../../handbook/sre/runbooks/error-budget-exhaustion.html">error budget exhaustion runbook</a> for breach handling.</p>
+
+        <h3>Alerting</h3>
+        <p>Prometheus <strong>alerting rules</strong> live under <code>services/monitoring/prometheus/rules/</code>. Alertmanager is not required for evaluation: firing alerts appear in the Prometheus UI (<code>/alerts</code>). Wiring Alertmanager for notifications is a follow-up.</p>
+      </section>
+
+      <section aria-labelledby="scope-h">
+        <h2 id="scope-h">Scope</h2>
+        <ul>
+          <li><strong>In scope:</strong> the conventions, rules, and artefacts named in the Decision section above.</li>
+          <li><strong>Out of scope:</strong> any system, process, or surface not explicitly listed here.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="alternatives-h">
+        <h2 id="alternatives-h">Alternatives considered</h2>
+        <p>Three alternatives were evaluated before committing to the SLI/SLO/budget triple + burn-rate alerts. Each is real (another serious team in the industry uses it) and explicitly rejected with a reason rooted in our constraints. Anchored on <em>Site Reliability Workbook</em> ch. 5 «Alerting on SLOs», pp. 88-93, table 5-2.</p>
+        <div class="docs-card-grid docs-card-grid--stack">
+          <article class="docs-card" data-tone="warn">
+            <div class="docs-card__head"><h3 class="docs-card__title">Threshold alerts only (no SLO, no error budget)</h3><span class="docs-pill docs-pill--danger">rejected</span></div>
+            <div class="docs-card__body">
+              <p><strong>Why considered:</strong> the «5xx rate &gt; 1% for 5 min ⇒ page» pattern. Simpler to write, no recording rules. Most non-SRE teams start here.</p>
+              <p><strong>Why rejected:</strong> threshold alerts are decoupled from customer impact — they fire on the same percentage during low and high traffic, which makes them either alarmist (during low-traffic nights) or silent (during high-traffic days). Error-budget burn is denominator-aware: 5xx during the day's traffic peak is treated as bigger than the same percentage at 3 a.m. The burn-rate model from SRE Workbook ch. 5 is the only one that makes alerts proportional to user pain.</p>
+            </div>
+          </article>
+          <article class="docs-card" data-tone="warn">
+            <div class="docs-card__head"><h3 class="docs-card__title">Higher target (99.99% «four nines»)</h3><span class="docs-pill docs-pill--danger">rejected</span></div>
+            <div class="docs-card__body">
+              <p><strong>Why considered:</strong> a stricter SLO signals «we care about uptime». Used by payment-rail and identity-provider services.</p>
+              <p><strong>Why rejected:</strong> four-nines availability requires investment we have not made — multi-region active-active, no-downtime deploys, an on-call rotation, sub-minute recovery times. Publishing 99.99% without those is theatre; the moment we miss it (and we will, given a single instance) the SLO becomes meaningless. 99.9% with measurable infrastructure is a credible commitment; 99.99% with our current infrastructure is not.</p>
+            </div>
+          </article>
+          <article class="docs-card" data-tone="warn">
+            <div class="docs-card__head"><h3 class="docs-card__title">External SLA from day one (with credits / refunds clause)</h3><span class="docs-pill docs-pill--danger">rejected</span></div>
+            <div class="docs-card__body">
+              <p><strong>Why considered:</strong> the «commit publicly so the team has skin in the game» argument. Forces operational discipline. Used by SaaS vendors with revenue tied to uptime.</p>
+              <p><strong>Why rejected:</strong> SLA is a customer contract, with legal and financial implications. We have no paying customers yet and no team to defend a breach in court; publishing an SLA before there is a commercial relationship is empty signalling. Internal SLO + the «SLA stricter than SLO» rule in <code>§ Optional external SLA</code> keeps the door open for the day we ship for money.</p>
+            </div>
+          </article>
+        </div>
+        <p><strong>Trade we accept by choosing SLO + budget + burn-rate alerts.</strong> We pay for the recording rules, the Blackbox container, and the operational overhead of explaining «what's the budget left?» to anyone new. We accept it because each rejected alternative either decouples alerts from customer impact (thresholds), commits us to infrastructure we have not built (99.99%), or makes promises we cannot defend (premature SLA). The SLI/SLO/budget triple is the smallest mechanism that ties reliability to a number we can actually move.</p>
+      </section>
+
+      <section aria-labelledby="consequences-h">
+        <h2 id="consequences-h">Consequences</h2>
+        <div class="docs-card-grid docs-card-grid--stack">
+          <article class="docs-card" data-tone="success">
+            <div class="docs-card__head"><h3 class="docs-card__title">Positive</h3><span class="docs-pill docs-pill--success">wins</span></div>
+            <div class="docs-card__body">
+              <ul>
+                <li>Shared language for reliability and explicit trade-offs between velocity and stability.</li>
+                <li>Alerts grounded in SLOs rather than ad hoc thresholds alone.</li>
+              </ul>
+            </div>
+          </article>
+          <article class="docs-card" data-tone="warn">
+            <div class="docs-card__head"><h3 class="docs-card__title">Trade-offs</h3><span class="docs-pill docs-pill--warn">costs</span></div>
+            <div class="docs-card__body">
+              <p>Two named tradeoffs accepted on purpose. Shape from
+                <a href="../../handbook/sa/tradeoff-disclosure.html">Tradeoff disclosure</a>.</p>
+                <ul class="rail-list" data-tone="rose">
+                  <li><strong>30-day rolling window with 99.9% target.</strong> We gain numbers that align with industry-standard SLO conventions (SRE Workbook ch. 4) and that the integrator can budget against in calendar quarters. We lose the precision a longer window would give in a low-traffic environment — the same single failure event has a larger ratio impact on a thin denominator. We accept it because 30 d is the smallest window where the budget arithmetic stays readable to humans; tuning the window for non-prod is allowed and called out in the dev-onboarding notes.</li>
+                  <li><strong>Blackbox-probed readiness as a separate SLI.</strong> We gain an outside-in view of <code>/ready</code> that catches «process is alive but the LB is not getting through» — the kind of incident a request-rate SLI alone would miss. We lose one extra container in the compose stack and the operational overhead of «Blackbox can scrape API host». We accept it because the external-probe perspective is irreplaceable for readiness; the container cost is paid once per environment.</li>
+                </ul>
+              </div>
+            </article>
+          </div>
+
+          <h3>Revisit — would we do this again?</h3>
+          <p><strong>Yes, with two SRE-Book moves we are still missing.</strong> The 99.9% target + 30-day window + Blackbox external probe has aged well; the budget arithmetic remains readable and the burn-rate alerts fire when something real is happening. Two refinements we would commit to on day one if starting today:</p>
+          <ul class="rail-list" data-tone="info">
+            <li><strong>Wire Alertmanager to Slack / PagerDuty, not just Prometheus UI.</strong> Today firing alerts appear at <code>/alerts</code>; nobody watches that URL. The page-on-burn loop is broken until Alertmanager routes; this was explicitly flagged as a follow-up in the ADR and is still open.</li>
+            <li><strong>Publish a one-page «what does 99.9% feel like» explainer in onboarding.</strong> The number is meaningless without translation: 99.9% ≈ 43 min / month of downtime allowance, ≈ 8.7 h / year. New joiners ask this question every time; the answer should be in the onboarding handbook, not in chat.</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="compatibility-h">
+          <h2 id="compatibility-h">Compatibility and migration</h2>
+          <ul>
+            <li><strong>Backward-compatibility impact:</strong> none — pure governance / convention change with no wire-level effect for existing consumers.</li>
+            <li><strong>Migration plan:</strong> apply the rules to new work; bring existing artefacts into compliance during normal touch-ups.</li>
+            <li><strong>Rollback strategy:</strong> revert the merge PR; no data or schema changes to undo.</li>
+          </ul>
+        </section>
+
+        <section aria-labelledby="implementation-h">
+          <h2 id="implementation-h">Implementation in this repository</h2>
+          <div class="docs-table-wrap" role="region" aria-label="SLO implementation surfaces">
+            <table class="docs-table docs-table--zebra">
+              <thead>
+                <tr>
+                  <th scope="col">Category</th>
+                  <th scope="col">Path / target</th>
+                  <th scope="col">Note</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Prometheus recording + alert rules</td><td><code>services/monitoring/prometheus/rules/study_app_slo.yml</code></td><td>burn-rate + threshold alerts</td></tr>
+                <tr><td>Blackbox config</td><td><code>services/monitoring/prometheus/blackbox.yml</code></td><td>module <code>http_2xx</code> for <code>/ready</code></td></tr>
+                <tr><td>Prometheus template</td><td><code>services/monitoring/prometheus/prometheus.tpl.yml</code></td><td><code>rule_files</code>, API scrape, Blackbox scrape</td></tr>
+                <tr><td>Config render script</td><td><code>tools/monitoring/render_prometheus_config.py</code></td><td>substitutes scrape target + ready-probe URL</td></tr>
+                <tr><td>Compose stack</td><td><code>services/monitoring/docker-compose.observability.yml</code></td><td>Blackbox service; Prometheus mounts rules</td></tr>
+                <tr><td>Grafana dashboard</td><td><code>services/monitoring/grafana/dashboards/study-app-observability.json</code></td><td>SLO panels (5xx, readiness, budget, p95)</td></tr>
+                <tr><td>Incident runbook</td><td><a href="../../handbook/sre/runbooks/error-budget-exhaustion.html">Runbook 0009 — Error budget exhaustion</a></td><td>policy + triage</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section aria-labelledby="validation-h">
+          <h2 id="validation-h">Validation</h2>
+          <ul>
+            <li><strong>Technical checks:</strong> CI lints, type-checks, and contract tests stay green on every PR.</li>
+            <li><strong>Operational checks:</strong> the relevant runbook reflects this rule.</li>
+            <li><strong>Documentation updates:</strong> README, CHANGELOG, and related ADRs cross-reference this decision.</li>
+          </ul>
+        </section>
+
+        <footer class="docs-history" aria-label="History">
+          <h2 class="docs-history__title">History</h2>
+          <ul class="docs-history__list">
+            <li class="docs-history__row">
+              <span class="docs-history__date">2026-06-01</span>
+              <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm">@ivan</a>
+              <span class="docs-history__note">Substance audit-pass. Result before: 2/5 (had a strong SLO table; no <code>§ Alternatives considered</code>; trade-offs were 2 unstructured bullets). Patch: status pill → <code>.lifecycle-popover</code>; <code>§ Implementation</code> bullet list → 7-row <code>.docs-table</code>; <code>§ Consequences &gt; Trade-offs</code> restructured into two canonical entries (30-day window · Blackbox probe); new <code>§ Alternatives considered</code> with three real alternatives (threshold-only · 99.99% target · public SLA from day one), anchored on <em>SRE Workbook ch. 5 pp. 88-93</em>; closing accept-clause; new <code>§ Would we do this again?</code> naming Alertmanager wiring + «what does 99.9% feel like» explainer. Inline <code>style</code> stripped.</span>
+            </li>
+            <li class="docs-history__row">
+              <span class="docs-history__date">2026-05-17</span>
+              <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm">@ivan</a>
+              <span class="docs-history__note">Migrated to UI Kit v3 (entry.css, docs-shell, page-head, consequences as paired tone cards, tables rewrapped).</span>
+            </li>
+          </ul>
+        </footer>
+
+      </article>
+    </main>
+
+    <aside class="docs-toc" aria-label="On this page"></aside>
+    <button data-component="toc-fab" type="button" aria-label="On this page" aria-expanded="false"></button>
+
+    <script type="module" src="../../../../frontend/portal/assets_v2/runtime/internal/entry.js"></script>
+
+  </body></html>

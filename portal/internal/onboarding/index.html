@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="en" data-portal="internal" data-theme="light"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Onboarding — pick your role · Study App Internal</title>
+  <script>(function(){try{var v=localStorage.getItem("docs-theme-preference");if(v==="dark"||v==="light")document.documentElement.setAttribute("data-theme",v);}catch(e){}})();</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..900&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="../../../frontend/portal/assets_v2/favicon.svg">
+  <link rel="stylesheet" href="../../../frontend/portal/assets_v2/runtime/internal/entry.css">
+</head>
+<body data-page-type="landing-section" class="docs-shell" data-maintainer-ids="16fc8b78537109162984a2fdbef6e142" data-service="none" data-lifecycle="published" data-updated="2026-06-06" data-role="">
+
+  <header class="topbar" role="banner">
+    <a class="topbar__brand" href="../index.html"><span aria-hidden="true">🛠</span><span>Study App · Internal</span></a>
+    <nav class="topbar__breadcrumbs" aria-label="Breadcrumb">
+      <ol class="docs-breadcrumbs__list">
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="../index.html">Internal</a></li>
+        <li class="docs-breadcrumbs__item" aria-current="page">Onboarding</li>
+      </ol>
+    </nav>
+    <div class="topbar__spacer"></div>
+    <div class="topbar__actions">
+      <button class="docs-theme-toggle" type="button" aria-label="Toggle theme"></button>
+    </div>
+  </header>
+
+  <aside data-component="sidebar" data-nav-src="../../../frontend/portal/assets_v2/ui-kit/mocks/nav-tree-internal.json" aria-label="Section navigation"></aside>
+
+  <main class="container">
+
+    <section class="home-hero home-hero--section">
+      <div class="home-hero__layout">
+        <div class="home-hero__copy">
+          <p class="home-hero__eyebrow">Internal · Onboarding</p>
+          <h1 class="home-hero__title">
+            Pick your role. Get productive in <span class="home-hero__title-accent">60 days</span>
+          </h1>
+          <div id="docs-top-nav"></div>
+          <p class="home-hero__tagline">
+            Every role on Study App has a paced 60-day journey — concrete reads, concrete
+            deliverables, an outcome bar at the end. Pick yours below. After that, a four-step
+            universal Day-1 spine gets the portal running locally so the journey starts from a
+            working environment.
+          </p>
+          <div class="home-hero__stats">
+            <a class="docs-pill docs-pill--accent" href="#by-role">Six 60-day journeys</a>
+            <a class="docs-pill docs-pill--info" href="#day-1">Day-1 spine — 30 min</a>
+            <a class="docs-pill docs-pill--success" href="cold-start.html">Senior cold-start ↗</a>
+            <a class="docs-pill docs-pill--neutral" href="glossary.html">Glossary</a>
+          </div>
+        </div>
+        <dl class="home-hero__tickers home-hero__tickers--2col" aria-label="Onboarding snapshot">
+          <div class="home-hero__ticker" data-tone="accent">
+            <dt>Roles</dt><dd>6</dd>
+          </div>
+          <div class="home-hero__ticker" data-tone="done">
+            <dt>Ramp</dt><dd>60d</dd>
+          </div>
+          <div class="home-hero__ticker" data-tone="progress">
+            <dt>Day-1 steps</dt><dd>4</dd>
+          </div>
+          <div class="home-hero__ticker" data-tone="todo">
+            <dt>Cold-start paths</dt><dd>7</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- ─────────────────── MAP — where things live ─────────────────── -->
+    <section class="lp-pillars" aria-labelledby="map-h">
+      <div class="lp-pillars__head">
+        <h2 class="lp-pillars__title" id="map-h">Map of the portal — where things live</h2>
+        <hr class="lp-pillars__rule">
+        <span class="lp-pillars__hint">Per ADR 0032 · six top-level sections</span>
+      </div>
+
+      <p>
+        Per ADR 0032 the portal follows a <strong>service-catalog-first IA</strong> (Backstage-style). Six top-level sections, each with a single load-bearing purpose. Read this once; the choice rule below tells you where to put anything new.
+      </p>
+
+      <ol class="spine-grid" aria-label="Portal map">
+
+        <li><a class="spine-tile" href="../services/index.html" data-tone="info">
+          <div class="spine-tile__head">
+            <span class="spine-tile__index">Services · catalog backbone</span>
+            <span class="spine-tile__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>
+            </span>
+          </div>
+          <h3 class="spine-tile__title">Services</h3>
+          <p class="spine-tile__body">One folder per deployable artefact (api, portal, datastore, monitoring, ui-kit). Each has its own overview, architecture, dependencies, API reference, on-call, runbooks, and postmortems.</p>
+          <div class="spine-tile__foot">
+            <span class="spine-tile__cta">Open services</span>
+            <span class="spine-tile__arrow" aria-hidden="true">→</span>
+          </div>
+        </a></li>
+
+        <li><a class="spine-tile" href="../handbook/index.html" data-tone="info">
+          <div class="spine-tile__head">
+            <span class="spine-tile__index">Handbook · cross-service craft</span>
+            <span class="spine-tile__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path><path d="M9 7h7"></path><path d="M9 11h7"></path></svg>
+            </span>
+          </div>
+          <h3 class="spine-tile__title">Handbook</h3>
+          <p class="spine-tile__body">Anything that applies across services. SA canon, SWE / QA / SRE practice, plus topical reference for data, security, UML, and managers.</p>
+          <div class="spine-tile__foot">
+            <span class="spine-tile__cta">Open handbook</span>
+            <span class="spine-tile__arrow" aria-hidden="true">→</span>
+          </div>
+        </a></li>
+
+        <li><a class="spine-tile" href="../team/index.html" data-tone="info">
+          <div class="spine-tile__head">
+            <span class="spine-tile__index">Team · people + role hubs</span>
+            <span class="spine-tile__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            </span>
+          </div>
+          <h3 class="spine-tile__title">Team</h3>
+          <p class="spine-tile__body">People — person pages and blog. Roles — six hubs (Architect, SWE, SA, QA, SRE, Manager), each with a radar, 25 practices, and a 60-day onboarding.</p>
+          <div class="spine-tile__foot">
+            <span class="spine-tile__cta">Meet the team</span>
+            <span class="spine-tile__arrow" aria-hidden="true">→</span>
+          </div>
+        </a></li>
+
+        <li><a class="spine-tile" href="../governance/index.html" data-tone="info">
+          <div class="spine-tile__head">
+            <span class="spine-tile__index">Governance · decisions</span>
+            <span class="spine-tile__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"></path><path d="M5 21h14"></path><path d="M7 6l10-2"></path><path d="M5 8l-3 6a3 3 0 0 0 6 0z"></path><path d="M19 6l-3 6a3 3 0 0 0 6 0z"></path></svg>
+            </span>
+          </div>
+          <h3 class="spine-tile__title">Governance</h3>
+          <p class="spine-tile__body">ADRs, RFCs, audits, backlog, traceability. Decisions, proposals, and the live status grid. Off-limits to routine edits — touched only by the decision flow.</p>
+          <div class="spine-tile__foot">
+            <span class="spine-tile__cta">Open governance</span>
+            <span class="spine-tile__arrow" aria-hidden="true">→</span>
+          </div>
+        </a></li>
+
+        <li><a class="spine-tile" href="../catalog/index.html" data-tone="info">
+          <div class="spine-tile__head">
+            <span class="spine-tile__index">Catalog · lens views</span>
+            <span class="spine-tile__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </span>
+          </div>
+          <h3 class="spine-tile__title">Catalog</h3>
+          <p class="spine-tile__body">Generated indexes from page metadata — by quadrant (Tutorial / How-to / Reference / Explanation), by service, by recency. Use it to find anything you can't remember the path of.</p>
+          <div class="spine-tile__foot">
+            <span class="spine-tile__cta">Open catalog</span>
+            <span class="spine-tile__arrow" aria-hidden="true">→</span>
+          </div>
+        </a></li>
+
+        <li><a class="spine-tile" href="index.html" data-tone="info">
+          <div class="spine-tile__head">
+            <span class="spine-tile__index">Onboarding · this page</span>
+            <span class="spine-tile__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7l10-4 10 4-10 4z"></path><path d="M6 9v6c0 1.5 3 3 6 3s6-1.5 6-3V9"></path></svg>
+            </span>
+          </div>
+          <h3 class="spine-tile__title">Onboarding</h3>
+          <p class="spine-tile__body">60-day journeys per role, the Day-1 spine, the cold-start path, and the glossary. The first stop when you join.</p>
+          <div class="spine-tile__foot">
+            <span class="spine-tile__cta">Stay here</span>
+            <span class="spine-tile__arrow" aria-hidden="true">→</span>
+          </div>
+        </a></li>
+
+      </ol>
+    </section>
+
+    <!-- ─────────────────── BY ROLE — primary block ─────────────────── -->
+    <section aria-labelledby="by-role-h">
+      <h2 id="by-role">Six 60-day journeys</h2>
+      <p>
+        Each tile opens the role's paced journey — week 1, week 2, week 4, month 2 — with the reads
+        and the deliverables for that role. The radar (AS-IS vs TO-BE) and the 25-practice map sit
+        one click further in.
+      </p>
+
+      <ol class="spine-grid" aria-label="Onboarding journeys by role">
+
+        <li><a class="spine-tile" href="../team/roles/architect/onboarding.html" data-tone="rose">
+          <div class="spine-tile__head">
+            <span class="spine-tile__index">01 · Architect</span>
+            <span class="spine-tile__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M5 21V9l7-6 7 6v12"></path><path d="M9 21v-6h6v6"></path></svg>
+            </span>
+          </div>
+          <h3 class="spine-tile__title">Architect</h3>
+          <p class="spine-tile__body">
+            Run an architectural review of the whole system without asking. By day 60 you defend the
+            SLO numbers, name the load-bearing ADRs, and ship your first trade-off study.
+          </p>
+          <div class="spine-tile__foot">
+            <span class="spine-tile__cta">First ADR · trade-off study</span>
+            <span class="spine-tile__arrow" aria-hidden="true">→</span>
+          </div>
+        </a></li>
+
+        <li><a class="spine-tile" href="../team/roles/swe/onboarding.html" data-tone="accent">
+          <div class="spine-tile__head">
+            <span class="spine-tile__index">02 · SWE</span>
+            <span class="spine-tile__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18l6-6-6-6"></path><path d="M8 6l-6 6 6 6"></path></svg>
+            </span>
+          </div>
+          <h3 class="spine-tile__title">SWE</h3>
+          <p class="spine-tile__body">
+            Zero-to-endpoint in week 1, a first migration by week 4, a reviewed-and-merged feature
+            with contract, idempotency and observability by day 60.
+          </p>
+          <div class="spine-tile__foot">
+            <span class="spine-tile__cta">Zero-to-endpoint · first migration</span>
+            <span class="spine-tile__arrow" aria-hidden="true">→</span>
+          </div>
+        </a></li>
+
+        <li><a class="spine-tile" href="../team/roles/sa/onboarding.html" data-tone="info">
+          <div class="spine-tile__head">
+            <span class="spine-tile__index">03 · Systems Analyst</span>
+            <span class="spine-tile__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path><path d="M9 7h7"></path><path d="M9 11h7"></path></svg>
+            </span>
+          </div>
+          <h3 class="spine-tile__title">Systems Analyst</h3>
+          <p class="spine-tile__body">
+            Diátaxis 101 in week 1, first page shipped through the docs-as-code gates. By day 60 you
+            author a feature spec with an ADR and a contract — independently.
+          </p>
+          <div class="spine-tile__foot">
+            <span class="spine-tile__cta">Diátaxis 101 · feature spec</span>
+            <span class="spine-tile__arrow" aria-hidden="true">→</span>
+          </div>
+        </a></li>
+
+        <li><a class="spine-tile" href="../team/roles/qa/onboarding.html" data-tone="success">
+          <div class="spine-tile__head">
+            <span class="spine-tile__index">04 · QA Engineer</span>
+            <span class="spine-tile__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg>
+            </span>
+          </div>
+          <h3 class="spine-tile__title">QA Engineer</h3>
+          <p class="spine-tile__body">
+            A11y audit in week 2, API checklist by week 4. By day 60 you've authored a full test
+            plan and your Pyramid coverage map is reviewed and acted on.
+          </p>
+          <div class="spine-tile__foot">
+            <span class="spine-tile__cta">A11y audit · API checklist</span>
+            <span class="spine-tile__arrow" aria-hidden="true">→</span>
+          </div>
+        </a></li>
+
+        <li><a class="spine-tile" href="../team/roles/sre/onboarding.html" data-tone="warn">
+          <div class="spine-tile__head">
+            <span class="spine-tile__index">05 · SRE</span>
+            <span class="spine-tile__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3-8 4 16 3-8h4"></path></svg>
+            </span>
+          </div>
+          <h3 class="spine-tile__title">SRE</h3>
+          <p class="spine-tile__body">
+            Runbook drill in week 2, capacity drill by week 4. By day 60 you've shadowed an on-call,
+            shipped a runbook, and own the dashboard for one service.
+          </p>
+          <div class="spine-tile__foot">
+            <span class="spine-tile__cta">Capacity drill · runbook drill</span>
+            <span class="spine-tile__arrow" aria-hidden="true">→</span>
+          </div>
+        </a></li>
+
+        <li><a class="spine-tile" href="../team/roles/manager/onboarding.html" data-tone="teal">
+          <div class="spine-tile__head">
+            <span class="spine-tile__index">06 · Engineering Manager</span>
+            <span class="spine-tile__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            </span>
+          </div>
+          <h3 class="spine-tile__title">Engineering Manager</h3>
+          <p class="spine-tile__body">
+            DoD walkthrough in week 1, sprint slice by week 4. By day 60 you've led a retro and
+            shipped one concrete change to the team's process.
+          </p>
+          <div class="spine-tile__foot">
+            <span class="spine-tile__cta">DoD walkthrough · sprint slice</span>
+            <span class="spine-tile__arrow" aria-hidden="true">→</span>
+          </div>
+        </a></li>
+
+      </ol>
+    </section>
+
+    <!-- ─────────────────── DAY-1 SPINE — universal ─────────────────── -->
+    <section aria-labelledby="day-1-h">
+      <h2 id="day-1">Day-1 spine · universal</h2>
+      <p>
+        Four steps every new joiner does on day one, regardless of role. About thirty minutes end to
+        end. Once it is done, switch to your role's journey above.
+      </p>
+
+      <ol class="path-timeline" data-tone="accent" aria-label="Day-1 universal spine">
+        <li>
+          <div>
+            <strong>Clone the repo and install <code>make</code>.</strong> Monorepo-style layout.
+            Run <code>make help</code> to see the docs-as-code targets you will use this week.
+            <a href="../handbook/sa/authoring/local-development.html">Local dev →</a>
+            <em>(~5 min)</em>
+          </div>
+        </li>
+        <li>
+          <div>
+            <strong>Serve the portal locally.</strong> Run <code>python3 -m http.server 3000 -d services</code>
+            and open <code>localhost:3000/portal/</code>. <a href="../index.html">Portal home →</a>
+            <em>(~3 min)</em>
+          </div>
+        </li>
+        <li>
+          <div>
+            <strong>Open your role hub.</strong> Pick one of the <a href="#by-role">six journeys above</a>;
+            the hub gives you the radar (AS-IS vs TO-BE) and a 25-practice map. This is your map.
+            <em>(~10 min)</em>
+          </div>
+        </li>
+        <li>
+          <div>
+            <strong>Skim the Diátaxis quadrant table.</strong> One read; refer back when authoring
+            anything — every role contributes docs eventually.
+            <a href="../handbook/sa/principles.html">SA principles →</a>
+            <em>(~10 min)</em>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ─────────────────── SENIOR COLD-START ─────────────────── -->
+    <section aria-labelledby="skip-spine-h">
+      <h2 id="skip-spine">Senior? Skip the spine.</h2>
+      <ol class="spine-grid" aria-label="Senior shortcut">
+
+        <li><a class="spine-tile" href="cold-start.html" data-tone="info">
+          <div class="spine-tile__head">
+            <span class="spine-tile__index">Cold-start · 7 paths</span>
+          </div>
+          <h3 class="spine-tile__title">Cold-start paths</h3>
+          <p class="spine-tile__body">The spine above is for first-time engineers. Seven curated reading sequences (Newcomer, Senior backend, Senior SA, SRE/on-call, QA, Architect, Manager) — each 6–15 pages, ~1 working day, with an explicit «you are productive when…» bar.</p>
+          <div class="spine-tile__foot">
+            <span class="spine-tile__cta">Open cold-start paths</span>
+            <span class="spine-tile__arrow" aria-hidden="true">→</span>
+          </div>
+        </a></li>
+
+        <li><a class="spine-tile" href="glossary.html" data-tone="info">
+          <div class="spine-tile__head">
+            <span class="spine-tile__index">Glossary · terms</span>
+          </div>
+          <h3 class="spine-tile__title">Onboarding glossary</h3>
+          <p class="spine-tile__body">Project-wide vocabulary — terms and acronyms a senior engineer should be able to map to portal pages on day one.</p>
+          <div class="spine-tile__foot">
+            <span class="spine-tile__cta">Open the glossary</span>
+            <span class="spine-tile__arrow" aria-hidden="true">→</span>
+          </div>
+        </a></li>
+
+      </ol>
+    </section>
+
+    <footer class="docs-history" aria-label="History">
+      <h2 class="docs-history__title">History</h2>
+      <ul class="docs-history__list">
+        <li class="docs-history__row">
+          <span class="docs-history__date">2026-06-03</span>
+          <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm">@ivan</a>
+          <span class="docs-history__note">Rebuilt as a role-router. Six 60-day journey tiles are now the primary block; the SA-flavoured Week-1 / Month-1 spines (Diátaxis, templates, ADR) moved into <code>team/roles/sa/onboarding.html</code> where they belong. The universal Day-1 spine kept — four role-agnostic steps that get the portal running locally. All page-local <code>.ob-*</code> CSS dropped; page now composes entirely from UI Kit v2 primitives (<code>home-hero</code> with tickers — matching every other hub in the portal, <code>spine-grid</code>, <code>path-timeline</code>, <code>docs-card--rail</code>). Per-tile <code>data-tone</code> added to <code>.spine-tile</code> in the kit so each role carries its own colour.</span>
+        </li>
+        <li class="docs-history__row">
+          <span class="docs-history__date">2026-05-23</span>
+          <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm">@ivan</a>
+          <span class="docs-history__note">Created the onboarding hub as part of Phase 1 of the IA restructure. Day 1 / Week 1 / Month 1 spine with anchored checklists; role-agnostic at the top, with deep-links into the legacy <code>tutorials/</code> role walkthroughs (to be renamed <code>onboarding/&lt;role&gt;/</code> in Phase 6).</span>
+        </li>
+      </ul>
+    </footer>
+
+    <section id="mobile-contract" aria-hidden="true" hidden="">
+      <h2>Mobile contract</h2>
+      <ul>
+        <li><strong>≥1025</strong> — role-router grid: 3-up (auto-fill, minmax 280); Day-1 timeline single column with full prose.</li>
+        <li><strong>761–1024</strong> — role-router grid: 2-up; Day-1 timeline unchanged.</li>
+        <li><strong>≤760</strong> — role-router grid: 1-up; Day-1 timeline tightens dot size; cold-start buttons stack full-width.</li>
+      </ul>
+    </section>
+
+  </main>
+  <aside class="docs-toc" aria-label="On this page">
+    <p class="docs-toc__title">On this page</p>
+    <ol class="docs-toc__list">
+      <li class="docs-toc__item"><a class="docs-toc__link" href="#by-role">Six 60-day journeys</a></li>
+      <li class="docs-toc__item"><a class="docs-toc__link" href="#day-1">Day-1 spine</a></li>
+      <li class="docs-toc__item"><a class="docs-toc__link" href="#skip-spine">Senior? Skip the spine</a></li>
+    </ol>
+  </aside>
+  <button data-component="toc-fab" type="button" aria-label="On this page" aria-expanded="false"></button>
+
+  <script type="module" src="../../../frontend/portal/assets_v2/runtime/internal/entry.js"></script>
+
+</body></html>

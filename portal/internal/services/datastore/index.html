@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en" data-portal="internal" data-theme="light"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>datastore · Catalog entry · Study App · Internal</title>
+  <script>(function(){try{var v=localStorage.getItem("docs-theme-preference");if(v==="dark"||v==="light")document.documentElement.setAttribute("data-theme",v);}catch(e){}})();</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..900&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="../../../../frontend/portal/assets_v2/favicon.svg">
+  <link rel="stylesheet" href="../../../../frontend/portal/assets_v2/runtime/internal/entry.css">
+  <style>
+    .ds-entities { display: grid; gap: var(--space-3); grid-template-columns: repeat(2, 1fr); margin-top: var(--space-3); }
+    .ds-entity {
+    display: flex; flex-direction: column; gap: var(--space-2);
+    padding: var(--space-4);
+    border: 1px solid var(--line); border-radius: var(--radius-md);
+    background: var(--bg-elev);
+    }
+    .ds-entity h3 { margin: 0; font-size: var(--fs-400); }
+    .ds-entity p  { margin: 0; color: var(--muted); font-size: var(--fs-300); }
+    .ds-entity__meta {
+    margin-top: auto;
+    font-family: var(--font-mono); font-size: var(--fs-100); letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--muted-soft);
+    }
+    @media (max-width: 760px) { .ds-entities { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body data-page-type="reference" class="docs-shell" data-maintainer-ids="16fc8b78537109162984a2fdbef6e142" data-service="datastore" data-lifecycle="published" data-updated="2026-06-06" data-role="architect">
+
+  <header class="topbar" role="banner">
+    <a class="topbar__brand" href="../../index.html"><span aria-hidden="true">🛠</span><span>Study App · Internal</span></a>
+    <nav class="topbar__breadcrumbs" aria-label="Breadcrumb">
+      <ol class="docs-breadcrumbs__list">
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="../../index.html">Internal</a></li>
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="../index.html">Services</a></li>
+        <li class="docs-breadcrumbs__item" aria-current="page">datastore</li>
+      </ol>
+    </nav>
+    <div class="topbar__spacer"></div>
+    <div class="topbar__actions">
+      <button class="docs-theme-toggle" type="button" aria-label="Toggle theme"></button>
+    </div>
+  </header>
+
+  <aside data-component="sidebar" data-nav-src="../../../../frontend/portal/assets_v2/ui-kit/mocks/nav-tree-internal.json" aria-label="Section navigation"></aside>
+
+  <main class="container">
+    <article class="docs-prose">
+
+      <!-- catalog:start id="entity-card" -->
+      <section class="entity-card" data-tone="info" id="entity" aria-labelledby="entity-name">
+        <header class="entity-card__head">
+          <div class="entity-card__pills">
+            <span class="docs-pill docs-pill--success"><span class="docs-pill__dot"></span>stable</span>
+            <span class="docs-pill docs-pill--info">SQLite</span>
+            <span class="docs-pill docs-pill--neutral">Postgres (prod)</span>
+            <span class="docs-pill docs-pill--neutral">Backstage descriptor</span>
+          </div>
+          <h1 class="entity-card__title" id="entity-name">datastore</h1>
+          <div id="docs-top-nav"></div>
+          <p class="entity-card__lede">Persistence layer — SQLite locally, Postgres in production. Alembic owns the forward and backward migrations.</p>
+        </header>
+
+        <dl class="entity-card__fields">
+          <dt>Owner</dt>
+          <dd><a href="../../team/people/ivan-boyarkin/index.html">Ivan Boyarkin</a></dd>
+
+          <dt>Lifecycle</dt>
+          <dd>stable</dd>
+
+          <dt>Provides</dt>
+          <dd>SQLite (dev) / Postgres (prod) persistence + Alembic migrations</dd>
+
+          <dt>Depends on</dt>
+          <dd>
+            <div class="dep-lanes" data-tone="info">
+              <div class="dep-lanes__row">
+                <span class="dep-lanes__label">Database</span>
+                <div class="dep-lanes__chips">
+                  <span class="dep-lanes__chip" data-status="current">
+                    <span class="dep-lanes__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="7" ry="2.5"/><path d="M5 6v12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5V6"/><path d="M5 12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5"/></svg></span>
+                    <span class="dep-lanes__name">SQLite</span>
+                  </span>
+                  <span class="dep-lanes__chip" data-status="planned">
+                    <span class="dep-lanes__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="7" ry="2.5"/><path d="M5 6v12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5V6"/><path d="M5 12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5"/><circle cx="17" cy="6" r="2" fill="currentColor" stroke="none"/></svg></span>
+                    <span class="dep-lanes__name">Postgres</span>
+                    <span class="dep-lanes__hint">prod</span>
+                  </span>
+                </div>
+              </div>
+              <div class="dep-lanes__row">
+                <span class="dep-lanes__label">ORM</span>
+                <div class="dep-lanes__chips">
+                  <span class="dep-lanes__chip" data-status="current">
+                    <span class="dep-lanes__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="2.5"/><path d="M4 5v6c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5V5"/><path d="M4 11v6c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5v-6"/></svg></span>
+                    <span class="dep-lanes__name">SQLAlchemy</span>
+                  </span>
+                </div>
+              </div>
+              <div class="dep-lanes__row">
+                <span class="dep-lanes__label">Migrations</span>
+                <div class="dep-lanes__chips">
+                  <span class="dep-lanes__chip" data-status="current">
+                    <span class="dep-lanes__icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><polyline points="20 4 20 9 15 9"/></svg></span>
+                    <span class="dep-lanes__name">Alembic</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <small class="dep-lanes__more">Full graph in <a href="dependencies.html">dependencies</a>.</small>
+          </dd>
+
+          <dt>Repo</dt>
+          <dd><code>services/api/app/db/</code></dd>
+        </dl>
+
+        <footer class="entity-card__foot">
+          <span><strong>Reviewed</strong> <time datetime="2026-06-06">2026-06-06</time></span>
+        </footer>
+      </section>
+      <!-- catalog:end -->
+      ]
+    </article>
+
+    <footer class="docs-history" aria-label="History">
+      <h2 class="docs-history__title">History</h2>
+      <ul class="docs-history__list">
+        <li class="docs-history__row">
+          <span class="docs-history__date">2026-05-23</span>
+          <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm">@ivan</a>
+          <span class="docs-history__note">Created the datastore service stub as part of Phase 1 of the IA restructure. Captures the logical service that owns reference data (users / timezones / systems / invalidation reasons). The actual reference pages migrate here from <code>handbook/data/</code> in Phase 5.</span>
+        </li>
+      </ul>
+    </footer>
+
+    <section id="mobile-contract" aria-hidden="true" hidden="">
+      <h2>Mobile contract</h2>
+      <ul>
+        <li><strong>≥1025</strong> — 2-up entity grid.</li>
+        <li><strong>761–1024</strong> — 2-up entity grid retained.</li>
+        <li><strong>≤760</strong> — single column.</li>
+      </ul>
+    </section>
+
+  </main>
+  <aside class="docs-toc" aria-label="On this page">
+    <p class="docs-toc__title">On this page</p>
+    <ol class="docs-toc__list">
+      <li class="docs-toc__item"><a class="docs-toc__link" href="#entities">Reference entities (preview)</a></li>
+    </ol>
+  </aside>
+  <button data-component="toc-fab" type="button" aria-label="On this page" aria-expanded="false"></button>
+
+  <script type="module" src="../../../../frontend/portal/assets_v2/runtime/internal/entry.js"></script>
+
+</body></html>

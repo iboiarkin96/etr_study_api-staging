@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en" data-portal="internal" data-theme="light"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ADR 0015 · Container Image · Study App Internal</title>
+  <script>(function(){try{var v=localStorage.getItem("docs-theme-preference");if(v==="dark"||v==="light")document.documentElement.setAttribute("data-theme",v);}catch(e){}})();</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..900&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="../../../../frontend/portal/assets_v2/favicon.svg">
+  <link rel="stylesheet" href="../../../../frontend/portal/assets_v2/runtime/internal/entry.css">
+</head>
+<body data-page-type="reference" class="docs-shell" data-maintainer-ids="16fc8b78537109162984a2fdbef6e142" data-service="none" data-lifecycle="published" data-updated="2026-06-06" data-role="architect">
+
+  <header class="topbar" role="banner">
+    <a class="topbar__brand" href="../../index.html"><span aria-hidden="true">🛠</span><span>Study App · Internal</span></a>
+    <nav class="topbar__breadcrumbs" aria-label="Breadcrumb">
+      <ol class="docs-breadcrumbs__list">
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="../../index.html">Internal</a></li>
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="../index.html">Governance</a></li>
+        <li class="docs-breadcrumbs__item"><a class="docs-breadcrumbs__link" href="index.html">ADR</a></li>
+        <li class="docs-breadcrumbs__item" aria-current="page">0015</li>
+      </ol>
+    </nav>
+    <div class="topbar__spacer"></div>
+    <div class="topbar__actions">
+      <button class="docs-theme-toggle" type="button" aria-label="Toggle theme"></button>
+    </div>
+  </header>
+
+  <aside data-component="sidebar" data-nav-src="../../../../frontend/portal/assets_v2/ui-kit/mocks/nav-tree-internal.json" aria-label="Section navigation"></aside>
+
+  <main class="container">
+    <article class="docs-prose">
+
+      <header class="page-head">
+        <div class="home-hero__eyebrow">
+          <span class="docs-pill docs-pill--info">ADR · 0015</span>
+          <div class="lifecycle-popover">
+            <a class="docs-pill docs-pill--success" href="0018-adr-lifecycle-ratification-and-badges.html">Accepted</a>
+            <div class="lifecycle-popover__panel" role="tooltip">
+              <span class="lifecycle-popover__title">Lifecycle · this ADR</span>
+              <ol class="lifecycle-popover__stages">
+                <li class="lifecycle-popover__stage" data-stage="decision">
+                  <span class="lifecycle-popover__stage-label">Decision</span>
+                  <ul class="lifecycle-popover__states">
+                    <li>Proposed</li>
+                    <li class="is-current">Accepted</li>
+                    <li>Superseded</li>
+                  </ul>
+                </li>
+                <li class="lifecycle-popover__stage" data-stage="documentation">
+                  <span class="lifecycle-popover__stage-label">Documentation</span>
+                  <ul class="lifecycle-popover__states">
+                    <li>Draft</li>
+                    <li>Ready</li>
+                  </ul>
+                </li>
+                <li class="lifecycle-popover__stage" data-stage="implementation">
+                  <span class="lifecycle-popover__stage-label">Implementation</span>
+                  <ul class="lifecycle-popover__states">
+                    <li>Not started</li>
+                    <li>In progress</li>
+                    <li>Done</li>
+                  </ul>
+                </li>
+              </ol>
+              <a class="lifecycle-popover__link" href="0018-adr-lifecycle-ratification-and-badges.html">Open ADR 0018 →</a>
+            </div>
+          </div>
+        </div>
+        <h1>Container Image</h1>
+        <div id="docs-top-nav"></div>
+        <p class="lede">
+          Provide a single Dockerfile aligned with <code>make install</code> so the bits CI tests
+          can run on a laptop, a VM, or a cloud host without depending on a specific account.
+        </p>
+      </header>
+
+      <section aria-labelledby="metadata-h">
+        <h2 id="metadata-h">Metadata</h2>
+        <dl class="svc-meta svc-meta--neutral">
+          <dt>ADR</dt>
+          <dd><code>0015</code> — Container Image</dd>
+          <dt>Category</dt>
+          <dd>workflow</dd>
+          <dt>Owner</dt>
+          <dd><a href="../../team/people/ivan-boyarkin/index.html">Ivan Boyarkin</a></dd>
+          <dt>Decided on</dt>
+          <dd><time datetime="2026-05-17">2026-05-17</time></dd>
+          <dt>Last reviewed</dt>
+          <dd><time datetime="2026-06-01">2026-06-01</time></dd>
+        </dl>
+      </section>
+
+      <section aria-labelledby="context-h">
+        <h2 id="context-h">Context</h2>
+        <p><strong>Why this matters:</strong> Local Python (<code>make run</code>) is the fastest feedback loop for feature work. Containers add a packaging boundary: the same bits you test in CI can run on a laptop, in a VM, or on a cloud host behind a registry.</p>
+        <p>Docker stays <strong>optional</strong> for daily coding; it complements the venv workflow. We ship a Dockerfile so integration tests and release flows do not depend on a specific cloud account.</p>
+      </section>
+
+      <section aria-labelledby="decision-h">
+        <h2 id="decision-h">Decision</h2>
+        <ul>
+          <li>Provide a <strong>Dockerfile</strong> at <code>services/api/Dockerfile</code> that installs dependencies from the same <code>requirements.txt</code> as <code>make install</code>, copies application and Alembic assets, runs as non-root user <code>uid 1000</code>, and sets <code>ENTRYPOINT</code> to the in-container <code>/app/scripts/container_entrypoint.sh</code> (copied from the host at <code>services/api/scripts/container_entrypoint.sh</code>): <code>alembic upgrade head</code> then Uvicorn. The image does not run <code>make</code> (no venv layout in-container).</li>
+          <li>Default container paths: SQLite file under <code>/data</code> (configurable via <code>SQLITE_DB_PATH</code>), logs under <code>/tmp/logs</code> when not overridden, to avoid permission issues on read-only layers.</li>
+          <li>Keep <strong>SQLite + single replica</strong> for this ADR's scope; document that scaling out requires a shared database.</li>
+          <li>Add Makefile helper <code>docker-build</code> and developer guide <code>services/portal/internal/handbook/sa/authoring/docker-image-and-container.html</code>.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="scope-h">
+        <h2 id="scope-h">Scope</h2>
+        <ul>
+          <li>In scope: image layout, entrypoint behavior, <code>docker run</code> documentation.</li>
+          <li>Out of scope: hosted registry promotion (see <a href="0021-continuous-delivery-github-actions-and-ghcr.html">ADR 0021</a>), production ingress/TLS, replacing SQLite with PostgreSQL.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="alternatives-h">
+        <h2 id="alternatives-h">Alternatives considered</h2>
+        <p>Three alternatives evaluated before adopting the single-Dockerfile + entrypoint-migration pattern. Each rejected with a rooted reason.</p>
+        <div class="docs-card-grid docs-card-grid--stack">
+          <article class="docs-card" data-tone="warn">
+            <div class="docs-card__head"><h3 class="docs-card__title"><code>docker-compose</code> for the API container</h3><span class="docs-pill docs-pill--danger">rejected</span></div>
+            <div class="docs-card__body">
+              <p><strong>Why considered:</strong> simple multi-container dev — bring up the API alongside any sidecars (DB, cache) with one command.</p>
+              <p><strong>Why rejected:</strong> the observability compose stack (<code>services/monitoring/docker-compose.observability.yml</code>) already exists separately and is the right place for multi-container dev (Prometheus + Grafana + Blackbox). A second <code>compose.yml</code> for «just the API» would compete with it and force every contributor to learn which compose file to bring up for which task. A bare <code>docker run study-app-api:local</code> is the smaller mechanism.</p>
+            </div>
+          </article>
+          <article class="docs-card" data-tone="warn">
+            <div class="docs-card__head"><h3 class="docs-card__title">Init container for migrations + app container without Alembic</h3><span class="docs-pill docs-pill--danger">rejected</span></div>
+            <div class="docs-card__body">
+              <p><strong>Why considered:</strong> Kubernetes-native pattern — clean separation of concerns, the app container has zero migration code.</p>
+              <p><strong>Why rejected:</strong> the pattern only pays off in K8s, where init containers are first-class. Standalone <code>docker run</code> for a contributor on a laptop has no init-container concept; supporting both modes means duplicating image config or shipping two images. The entrypoint-driven «migrate, then serve» path works identically in dev, CI, and registry pulls.</p>
+            </div>
+          </article>
+          <article class="docs-card" data-tone="warn">
+            <div class="docs-card__head"><h3 class="docs-card__title">Distroless / scratch base image</h3><span class="docs-pill docs-pill--danger">rejected</span></div>
+            <div class="docs-card__body">
+              <p><strong>Why considered:</strong> smaller attack surface, smaller image — distroless Python images strip out the package manager and shell, leaving only the runtime.</p>
+              <p><strong>Why rejected:</strong> our entrypoint is a shell script (<code>services/api/scripts/container_entrypoint.sh</code>) that runs <code>alembic upgrade head</code> before <code>uvicorn</code> — distroless has no shell. We could rewrite the entrypoint as Python, but the shell version is the same path used in dev (<code>make run</code>), which is the load-bearing «one path for local and container» property. Distroless is the right move the day attack-surface review becomes a constraint; not before.</p>
+            </div>
+          </article>
+        </div>
+        <p><strong>Trade we accept by choosing single-Dockerfile + entrypoint-driven migration.</strong> One image, one entrypoint, one shell path. We accept the larger base image and SQLite/single-replica coupling because each rejected alternative either splinters the «one mode for dev / CI / container» promise (compose, init container) or breaks the «shell entrypoint same as host run» property (distroless).</p>
+      </section>
+
+      <section aria-labelledby="consequences-h">
+        <h2 id="consequences-h">Consequences</h2>
+        <div class="docs-card-grid docs-card-grid--stack">
+          <article class="docs-card" data-tone="success">
+            <div class="docs-card__head"><h3 class="docs-card__title">Positive</h3><span class="docs-pill docs-pill--success">wins</span></div>
+            <div class="docs-card__body">
+              <ul>
+                <li>Single reproducible artifact (image) aligned with CI and release practices.</li>
+                <li>Readiness/liveness endpoints exercise the same checks used behind load balancers and in health probes.</li>
+              </ul>
+            </div>
+          </article>
+          <article class="docs-card" data-tone="warn">
+            <div class="docs-card__head"><h3 class="docs-card__title">Trade-offs</h3><span class="docs-pill docs-pill--warn">costs</span></div>
+            <div class="docs-card__body">
+              <p>Two named tradeoffs. Shape from <a href="../../handbook/sa/tradeoff-disclosure.html">Tradeoff disclosure</a>.</p>
+              <ul class="rail-list" data-tone="rose">
+                <li><strong>SQLite + single-replica scope.</strong> We gain a self-contained image that needs no external infrastructure to run — one <code>docker run</code> and the API is up. We lose multi-replica HA (SQLite cannot be the shared store across replicas). We accept it because the scope of this ADR is the packaging artefact, not the deployment topology; multi-replica is a Postgres-swap concern (<a href="../../explanation/architecture-narrative.html#next">narrative § 09</a>), gated by trigger, not date.</li>
+                <li><strong>Entrypoint runs Alembic before Uvicorn.</strong> We gain a single path that works identically in dev / CI / registry pulls — boot the container and the schema is up-to-date. We lose the K8s-pattern separation of init-vs-app concerns. We accept it because the boundary the init pattern enforces is not load-bearing in our deploy (we are not on K8s); the path-uniformity property is.</li>
+              </ul>
+            </div>
+          </article>
+        </div>
+        <h3>Revisit — would we do this again?</h3>
+        <p><strong>Yes.</strong> One refinement we would add on day one:</p>
+        <ul class="rail-list" data-tone="info">
+          <li><strong>Build the image in CI on every PR, not just on tag.</strong> Today <code>docker-build</code> is a manual <code>make</code> target; a broken Dockerfile lands silently because nothing tests it pre-merge. A 90-second build job in <code>.github/workflows/test.yml</code> would catch dependency drift between <code>requirements.txt</code> and what the image actually installs.</li>
+        </ul>
+
+      </section>
+
+      <section aria-labelledby="compatibility-h">
+        <h2 id="compatibility-h">Compatibility and migration</h2>
+        <ul>
+          <li>Backward-compatibility impact: <strong>none</strong> for Python APIs; additive files only.</li>
+          <li>Migration plan: N/A.</li>
+          <li>Rollback strategy: continue with <code>make run</code> without using the image.</li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="implementation-h">
+        <h2 id="implementation-h">Implementation plan</h2>
+        <ol>
+          <li>Add <code>services/api/Dockerfile</code>, <code>services/api/scripts/container_entrypoint.sh</code>, <code>services/api/.dockerignore</code>.</li>
+          <li>Document in developer guide and this ADR; link from ADR index.</li>
+        </ol>
+      </section>
+
+      <section aria-labelledby="validation-h">
+        <h2 id="validation-h">Validation</h2>
+        <ul>
+          <li>Technical: <code>docker build -t study-app-api:local .</code> succeeds; <code>docker run</code> with appropriate env returns HTTP 200 on <code>/live</code>.</li>
+          <li>Documentation: developer guide and ADR cross-linked.</li>
+        </ul>
+      </section>
+
+      <footer class="docs-history" aria-label="History">
+        <h2 class="docs-history__title">History</h2>
+        <ul class="docs-history__list">
+          <li class="docs-history__row">
+            <span class="docs-history__date">2026-06-01</span>
+            <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm">@ivan</a>
+            <span class="docs-history__note">Substance audit-pass. Status pill → <code>.lifecycle-popover</code>; thin pros/cons <code>§ Alternatives</code> rewritten to «Why considered / Why rejected» template with a third alternative (distroless / scratch base); <code>§ Trade-offs</code> restructured into two canonical entries (SQLite + single replica · Alembic in entrypoint); new <code>§ Would we do this again?</code> proposing pre-merge image build. Inline <code>style</code> stripped.</span>
+          </li>
+          <li class="docs-history__row">
+            <span class="docs-history__date">2026-05-17</span>
+            <a class="docs-history__author" data-component="author-chip" data-person-id="16fc8b78537109162984a2fdbef6e142" data-variant="sm">@ivan</a>
+            <span class="docs-history__note">Migrated to UI Kit v3.</span>
+          </li>
+        </ul>
+      </footer>
+
+    </article>
+  </main>
+
+  <aside class="docs-toc" aria-label="On this page"></aside>
+  <button data-component="toc-fab" type="button" aria-label="On this page" aria-expanded="false"></button>
+
+  <script type="module" src="../../../../frontend/portal/assets_v2/runtime/internal/entry.js"></script>
+
+</body></html>
